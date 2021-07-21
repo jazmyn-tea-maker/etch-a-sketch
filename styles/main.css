@@ -1,7 +1,46 @@
+body {
+    background-color: black;
+}
+
+.game-title {
+    color: white;
+    text-align: center;
+    position: relative;
+    top: 1vh;
+}
+
 #canvas {
-    height: 450px;
-    width: 450px;
+    height: 350px;
+    width: 350px;
     display: grid;
+    position: relative;
     margin: auto;
-    overflow: hidden;
+    top: 1vh;
+    padding: 0 0 30vh 0;
+}
+
+.rangeContainer {
+    width: 300px;
+    height: auto;
+    position: relative;
+    margin: auto;
+    top: -2vh;
+}
+
+.slider {
+    appearance: none;
+    background-color: gray;
+    border-radius: 5px;
+    height: 10px;
+    width: 300px;
+}
+
+#myRange {
+    position: relative;
+    margin: auto;
+}
+
+
+.slider::-moz-range-thumb {
+    background-color: rgb(98, 167, 207);
 }

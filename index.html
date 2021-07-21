@@ -3,14 +3,21 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title></title>
+        <title>Etch-a-sketch!</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="styles/main.css">
+        <link rel="stylesheet" href="/styles/main.css">
     </head>
     <body>
-        <div class='slider-top'></div>
-        <div class='slider-bottom'></div>
+        <h1 class='game-title'>Etch-a-Sketch</h1>
+        <div class='rangeContainer'>
+            <label for='box-range'>
+                <input name='box-range' type="range" min="4" max="961" value="4" class="slider" id="myRange" step='6'>
+                <datalist id='dataList'>
+                </datalist>
+            </label>
+        </div>
+
         <div id='canvas'></div>
         <script src="etch-a-sketch.js" async defer></script>
     </body>
