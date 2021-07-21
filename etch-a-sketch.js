@@ -35,7 +35,6 @@ slider.addEventListener('change', function () {
     }
 })
 
-
 let stepList = () => {
     for (j = 4; j < 1000; j++) {
         if (Math.sqrt(j) % 1 == 0) {

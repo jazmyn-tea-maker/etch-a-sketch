@@ -6,7 +6,7 @@ body {
     color: white;
     text-align: center;
     position: relative;
-    top: 1vh;
+    top: -2vh;
 }
 
 #canvas {
@@ -15,7 +15,7 @@ body {
     display: grid;
     position: relative;
     margin: auto;
-    top: 1vh;
+    top: -3vh;
     padding: 0 0 30vh 0;
 }
 
@@ -24,7 +24,7 @@ body {
     height: auto;
     position: relative;
     margin: auto;
-    top: -2vh;
+    top: -6vh;
 }
 
 .slider {
@@ -43,4 +43,18 @@ body {
 
 .slider::-moz-range-thumb {
     background-color: rgb(98, 167, 207);
+}
+
+.size-input-div {
+    display: block;
+    position: relative;
+    margin: auto;
+    bottom: 4vh;
+}
+
+.size-input {
+    display: block;
+    position: relative;
+    margin: auto;
+    bottom: 5px;
 }
