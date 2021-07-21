@@ -15,11 +15,11 @@ let rowAndColumnNum = Math.sqrt(sliderNum);
 
 let canvas = document.getElementById('canvas');
 
-for (i = 0; i <= sliderNum; i++) {
+for (i = 0; i < sliderNum; i++) {
     let lilDiv = document.createElement('div');
     lilDiv.style.cssText = `
-        border: 1px solid black; 
-        flex-grow: 1;
+        background-color: white;
+        border: .1px solid gray;
     `;
     canvas.appendChild(lilDiv);
 }

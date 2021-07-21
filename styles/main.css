@@ -1,8 +1,7 @@
 #canvas {
-    height: 400px;
-    width: 400px;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    background-color: aquamarine;
+    height: 450px;
+    width: 450px;
+    display: grid;
+    margin: auto;
+    overflow: hidden;
 }
