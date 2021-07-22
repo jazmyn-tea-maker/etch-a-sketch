@@ -55,7 +55,7 @@ body {
 }
 
 #size-input {
-    left: 3px;
+    margin: auto;
     display: block;
     position: relative;
 }

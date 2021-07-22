@@ -1,8 +1,8 @@
-
 let slider = document.getElementById('myRange');
 let sliderNum =  4; // Default size.
 let dataList = document.getElementById('dataList');
 let canvas = document.getElementById('canvas');
+let htmlStyle = document.getElementsByTagName('style');
 
 // Setting up default size:
 let rowAndColumnNum = Math.sqrt(sliderNum);
@@ -10,10 +10,14 @@ canvas.style.gridTemplateRows = `repeat(${rowAndColumnNum}, 1fr)`;
 canvas.style.gridTemplateColumns = `repeat(${rowAndColumnNum}, 1fr)`;
 for (k = 0; k < sliderNum; k++) {
     let lilDiv = document.createElement('div');
+    lilDiv.id = `div${k}`;
     lilDiv.style.cssText = `
         background-color: white;
         border: .1px solid gray;
     `;
+    lilDiv.addEventListener('mouseenter', function(e) {
+        e.target.style.backgroundColor = 'pink';
+    });
     canvas.appendChild(lilDiv);
 }
 
@@ -28,7 +32,7 @@ function getClosest(arr, valueOfSlider) {
 //If the user inputs text, use that.
 let userInput = document.getElementById('size-input');
 
-userInput.addEventListener('change', userCustomSize = () => {
+userInput.addEventListener('input', userCustomSize = () => {
     let userInputSize = parseInt(document.getElementById('size-input').value) // Turns the input into a number.
     let optionArr = []; // Array that holds values available (to snap to).
     for (i = 4; i < 1000; i ++) {
@@ -48,6 +52,9 @@ userInput.addEventListener('change', userCustomSize = () => {
                 background-color: white;
                 border: .1px solid gray;
             `;
+            lilDiv.addEventListener('mouseenter', function(e) {
+                e.target.style.backgroundColor = 'pink';
+            });
         canvas.appendChild(lilDiv);
         }
     }
@@ -55,7 +62,7 @@ userInput.addEventListener('change', userCustomSize = () => {
 })
 
 // If the user slides the bar, use the value from that.
-slider.addEventListener('change', changeCanvasSize = () => {
+slider.addEventListener('input', changeCanvasSize = () => {
     sliderNum = document.getElementById('myRange').value;
     let optionArr = []; // Array that holds values available (to snap to).
     for (i = 4; i < 1000; i ++) {
@@ -75,6 +82,9 @@ slider.addEventListener('change', changeCanvasSize = () => {
                 background-color: white;
                 border: .1px solid gray;
             `;
+            lilDiv.addEventListener('mouseenter', function(e) {
+                e.target.style.backgroundColor = 'pink';
+            });
         canvas.appendChild(lilDiv);
         }
     }
@@ -91,7 +101,5 @@ let stepList = () => {
 }
 
 stepList();
-
-console.log(dataList);
 
 slider.list = dataList;
