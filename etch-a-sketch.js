@@ -1,4 +1,5 @@
 let slider = document.getElementById('myRange');
+slider.value = 4; // Default size.
 let sliderNum =  4; // Default size.
 let dataList = document.getElementById('dataList');
 let canvas = document.getElementById('canvas');
@@ -22,6 +23,7 @@ for (k = 0; k < sliderNum; k++) {
     canvas.appendChild(lilDiv);
 }
 
+// Grid needs squares to fit into square div.
 // Snaps to the closest (least difference) square in array with
 // all squares under 1000:
 function getClosest(arr, valueOfSlider) {
@@ -34,14 +36,14 @@ function getClosest(arr, valueOfSlider) {
 let userInput = document.getElementById('size-input'); 
 
 // If the user inputs text, use that.
-
 userInput.addEventListener('keydown', userCustomSize = (e) => {
+
     if (e.key == 'Enter' || e.eventCode == 13) {
         let userInputSize = parseInt(userInput.value);// Turns the input into a number.
         let optionArr = []; // Array that holds values available (to snap to).
         for (i = 4; i < 1000; i ++) {
-            if (Math.sqrt(i) % 1 == 0) {
-                optionArr.push(i);
+            if (Math.sqrt(i) % 1 == 0) { // If the square root of a num isn't divisible by 1 with a 
+                optionArr.push(i); // remainder of 0, it is not a square.
             }
         }
         userInputSqrt = getClosest(optionArr, userInputSize);
@@ -66,10 +68,12 @@ userInput.addEventListener('keydown', userCustomSize = (e) => {
         }
         userInput.value = ''; // Clears text input.
     }
+
 })
 
 // If the user slides the bar, use the value from that.
 slider.addEventListener('input', changeCanvasSize = () => {
+
     sliderNum = document.getElementById('myRange').value;
     let optionArr = []; // Array that holds values available (to snap to).
     for (i = 4; i < 1000; i ++) {
@@ -95,9 +99,11 @@ slider.addEventListener('input', changeCanvasSize = () => {
         canvas.appendChild(lilDiv);
         }
     }
+
 })
 
 let stepList = () => {
+
     for (j = 4; j < 1000; j++) {
         if (Math.sqrt(j) % 1 == 0) {
             let newOption = document.createElement('option');
@@ -105,6 +111,7 @@ let stepList = () => {
             dataList.appendChild(newOption);
         }
     }
+
 }
 
 stepList();
