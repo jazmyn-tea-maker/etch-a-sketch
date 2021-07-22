@@ -46,15 +46,16 @@ body {
 }
 
 .size-input-div {
-    display: block;
-    position: relative;
+    width: 200px;
+    height: 30px;
+    display: flex;
     margin: auto;
+    position: relative;
     bottom: 4vh;
 }
 
-.size-input {
+#size-input {
+    left: 3px;
     display: block;
     position: relative;
-    margin: auto;
-    bottom: 5px;
 }
