@@ -29,36 +29,42 @@ function getClosest(arr, valueOfSlider) {
   });
 }
 
-//If the user inputs text, use that.
-let userInput = document.getElementById('size-input');
 
-userInput.addEventListener('input', userCustomSize = () => {
-    let userInputSize = parseInt(document.getElementById('size-input').value) // Turns the input into a number.
-    let optionArr = []; // Array that holds values available (to snap to).
-    for (i = 4; i < 1000; i ++) {
-        if (Math.sqrt(i) % 1 == 0) {
-            optionArr.push(i);
+let userInput = document.getElementById('size-input'); 
+
+//If the user inputs text, use that.
+
+userInput.addEventListener('keydown', userCustomSize = (e) => {
+    if (e.key == 'Enter') {
+            let userInputSize = parseInt(userInput.value);// Turns the input into a number.
+        let optionArr = []; // Array that holds values available (to snap to).
+        for (i = 4; i < 1000; i ++) {
+            if (Math.sqrt(i) % 1 == 0) {
+                optionArr.push(i);
+            }
         }
-    }
-    userInputSqrt = getClosest(optionArr, userInputSize);
-    if (Math.sqrt(userInputSqrt) % 1 == 0) {
-        let rowAndColumnNum = Math.sqrt(userInputSqrt);
-        canvas.style.gridTemplateRows = `repeat(${rowAndColumnNum}, 1fr)`;
-        canvas.style.gridTemplateColumns = `repeat(${rowAndColumnNum}, 1fr)`;
-        canvas.innerHTML = '';
-        for (i = 0; i < userInputSqrt; i++) {
-            let lilDiv = document.createElement('div');
-            lilDiv.style.cssText = `
-                background-color: white;
-                border: .1px solid gray;
-            `;
-            lilDiv.addEventListener('mouseenter', function(e) {
-                e.target.style.backgroundColor = 'pink';
-            });
-        canvas.appendChild(lilDiv);
+        userInputSqrt = getClosest(optionArr, userInputSize);
+        if (Math.sqrt(userInputSqrt) % 1 == 0) {
+            let rowAndColumnNum = Math.sqrt(userInputSqrt);
+            canvas.style.gridTemplateRows = `repeat(${rowAndColumnNum}, 1fr)`;
+            canvas.style.gridTemplateColumns = `repeat(${rowAndColumnNum}, 1fr)`;
+            canvas.innerHTML = '';
+            for (i = 0; i < userInputSqrt; i++) {
+                let lilDiv = document.createElement('div');
+                lilDiv.style.cssText = `
+                    background-color: white;
+                    border: .1px solid gray;
+                `;
+                lilDiv.addEventListener('mouseenter', function(e) {
+                    if (e.target.style.backgroundColor == 'white') {
+                        e.target.style.backgroundColor = 'pink';
+                    } 
+                });
+                canvas.appendChild(lilDiv);
+            }
         }
+        userInput.value = ''; 
     }
-    console.log(userInputSize);
 })
 
 // If the user slides the bar, use the value from that.
