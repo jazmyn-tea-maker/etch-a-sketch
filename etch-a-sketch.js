@@ -3,6 +3,7 @@ let sliderNum =  4; // Default size.
 let dataList = document.getElementById('dataList');
 let canvas = document.getElementById('canvas');
 let htmlStyle = document.getElementsByTagName('style');
+let divColor = document.getElementById('color-selector');
 
 // Setting up default size:
 let rowAndColumnNum = Math.sqrt(sliderNum);
@@ -16,7 +17,7 @@ for (k = 0; k < sliderNum; k++) {
         border: .1px solid gray;
     `;
     lilDiv.addEventListener('mouseenter', function(e) {
-        e.target.style.backgroundColor = 'pink';
+        e.target.style.backgroundColor = divColor.value;
     });
     canvas.appendChild(lilDiv);
 }
@@ -32,11 +33,11 @@ function getClosest(arr, valueOfSlider) {
 
 let userInput = document.getElementById('size-input'); 
 
-//If the user inputs text, use that.
+// If the user inputs text, use that.
 
 userInput.addEventListener('keydown', userCustomSize = (e) => {
-    if (e.key == 'Enter') {
-            let userInputSize = parseInt(userInput.value);// Turns the input into a number.
+    if (e.key == 'Enter' || e.eventCode == 13) {
+        let userInputSize = parseInt(userInput.value);// Turns the input into a number.
         let optionArr = []; // Array that holds values available (to snap to).
         for (i = 4; i < 1000; i ++) {
             if (Math.sqrt(i) % 1 == 0) {
@@ -56,14 +57,14 @@ userInput.addEventListener('keydown', userCustomSize = (e) => {
                     border: .1px solid gray;
                 `;
                 lilDiv.addEventListener('mouseenter', function(e) {
-                    if (e.target.style.backgroundColor == 'white') {
-                        e.target.style.backgroundColor = 'pink';
-                    } 
+                    e.target.style.backgroundColor = divColor.value;
+                    // When the cursor 'hovers'/'enters' a div, it will
+                    // change color.
                 });
                 canvas.appendChild(lilDiv);
             }
         }
-        userInput.value = ''; 
+        userInput.value = ''; // Clears text input.
     }
 })
 
@@ -89,7 +90,7 @@ slider.addEventListener('input', changeCanvasSize = () => {
                 border: .1px solid gray;
             `;
             lilDiv.addEventListener('mouseenter', function(e) {
-                e.target.style.backgroundColor = 'pink';
+                e.target.style.backgroundColor = divColor.value;
             });
         canvas.appendChild(lilDiv);
         }

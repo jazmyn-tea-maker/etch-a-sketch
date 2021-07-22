@@ -1,5 +1,11 @@
+html {
+    overflow: hidden;
+}
+
 body {
     background-color: black;
+    margin: 0;
+    padding: 0;
 }
 
 .game-title {
@@ -17,6 +23,25 @@ body {
     margin: auto;
     top: -3vh;
     padding: 0 0 30vh 0;
+}
+
+.color-select-title {
+    text-align: center;
+    color: white;
+}
+
+.color-select-div {
+    position: relative;
+    width: 250px;
+    height: auto;
+    bottom: 60vh;
+}
+
+#color-selector {
+    position: relative;
+    display: block;
+    margin: auto;
+    width: 100px;
 }
 
 .rangeContainer {
