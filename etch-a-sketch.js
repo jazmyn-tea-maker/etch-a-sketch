@@ -1,10 +1,11 @@
 let slider = document.getElementById('myRange');
 slider.value = 4; // Default size.
-let sliderNum =  4; // Default size.
+let sliderNum = 4; // Default size.
 let dataList = document.getElementById('dataList');
 let canvas = document.getElementById('canvas');
 let htmlStyle = document.getElementsByTagName('style');
 let divColor = document.getElementById('color-selector');
+let timeout;
 
 // Setting up default size:
 let rowAndColumnNum = sliderNum;
@@ -17,20 +18,29 @@ for (k = 0; k < sliderNum ** 2; k++) {
         background-color: white;
         border: .1px solid gray;
     `;
-    function hoverFunc(e) {
-        e.target.style.backgroundColor = divColor.value;
-    }
-    canvas.addEventListener('mousedown', function clickHoldFunc(e) {
-        lilDiv.addEventListener('mouseenter', hoverFunc);
-        canvas.addEventListener('mouseup', function(e) {
-            lilDiv.removeEventListener('mouseenter', hoverFunc);
-            e.target.removeEventListener('mousedown', clickHoldFunc);
-        })
-    });
-    canvas.appendChild(lilDiv); 
+    canvas.appendChild(lilDiv);
 }
 
-let userInput = document.getElementById('size-input'); 
+function hoverFunc(e) {
+    e.target.style.backgroundColor = divColor.value;
+}
+
+let eventsFunc = (div) => {
+    canvas.addEventListener('mousedown', function clickHoldFunc(e) {
+        div.addEventListener('mouseenter', hoverFunc);
+        canvas.addEventListener('mouseup', function (e) {
+            div.removeEventListener('mouseenter', hoverFunc);
+            e.target.removeEventListener('mousedown', clickHoldFunc);
+            return true;
+        })
+    });
+}
+for (h = 0; h < canvas.childElementCount; h++) {
+    let eachDiv = canvas.children.item(h);
+    eventsFunc(eachDiv);
+}
+
+let userInput = document.getElementById('size-input');
 
 // If the user inputs text, use that.
 userInput.addEventListener('keydown', userCustomSize = (e) => {
@@ -56,16 +66,26 @@ userInput.addEventListener('keydown', userCustomSize = (e) => {
                 } //PROBLEM: Lag! The canvas is creating itself over and over and over
                 // again with all these event listeners firing. It's taxing.
                 // Need to make separate loop.
-                canvas.addEventListener('mousedown', function clickHoldFunc(e) {
-                    lilDiv.addEventListener('mouseenter', hoverFunc);
-                    canvas.addEventListener('mouseup', function(e) {
-                        lilDiv.removeEventListener('mouseenter', hoverFunc);
-                        e.target.removeEventListener('mousedown', clickHoldFunc);
-                    })
-                });
+                
                 canvas.appendChild(lilDiv);
             }
         }
+
+        let eventsFunc = (div) => {
+            canvas.addEventListener('mousedown', function clickHoldFunc(e) {
+                div.addEventListener('mouseenter', hoverFunc);
+                canvas.addEventListener('mouseup', function (e) {
+                    div.removeEventListener('mouseenter', hoverFunc);
+                    e.target.removeEventListener('mousedown', clickHoldFunc);
+                    return true;
+                })
+            });
+        }
+        for (h = 0; h < canvas.childElementCount; h++) {
+            let eachDiv = canvas.children.item(h);
+            eventsFunc(eachDiv);
+        }
+
         userInput.value = ''; // Clears text input.
     }
 
@@ -85,17 +105,32 @@ slider.addEventListener('input', changeCanvasSize = () => {
             background-color: white;
             border: .1px solid gray;
         `;
-        function hoverFunc(e) {
-            e.target.style.backgroundColor = divColor.value;
-        }
-        canvas.addEventListener('mousedown', function clickHoldFunc(e) {
-            lilDiv.addEventListener('mouseenter', hoverFunc);
-            canvas.addEventListener('mouseup', function(e) {
-                lilDiv.removeEventListener('mouseenter', hoverFunc);
-                e.target.removeEventListener('mousedown', clickHoldFunc);
-            })
-        });
         canvas.appendChild(lilDiv);
     }
-    
-})
+
+    let eventsFunc = (div) => {
+        canvas.addEventListener('mousedown', function clickHoldFunc(e) {
+            div.addEventListener('mouseenter', hoverFunc);
+            canvas.addEventListener('mouseup', function (e) {
+                div.removeEventListener('mouseenter', hoverFunc);
+                e.target.removeEventListener('mousedown', clickHoldFunc);
+                return true;
+            });
+            
+        });
+    };
+
+    if ( !timeout ) {
+        timeout = setTimeout(function() {
+            // Reset timeout
+            timeout = null;
+            // Run functions
+            for (h = 0; h < canvas.childElementCount; h++) {
+                let eachDiv = canvas.children.item(h);
+                eventsFunc(eachDiv);
+            }
+        }, 20);
+
+    };
+});
+
