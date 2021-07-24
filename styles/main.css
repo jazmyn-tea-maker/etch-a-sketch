@@ -1,6 +1,6 @@
-html {
+/* html {
     overflow: hidden;
-}
+} */
 
 body {
     background-color: black;
@@ -15,41 +15,74 @@ body {
     top: -2vh;
 }
 
+.all-UI {
+    display: flex;
+    margin: auto;
+    position: relative;
+    justify-content: center;
+    height: 350px;
+    width: 650px;
+}
+
+.tool-panel {
+    display: flex;
+    flex-wrap: wrap;
+    height: 350px;
+    width: 225px;
+    background-color: rgb(166, 186, 194);
+}
+
 #canvas {
     height: 350px;
     width: 350px;
     display: grid;
     position: relative;
-    margin: auto;
-    top: -3vh;
+    margin-left: 30px;
     padding: 0 0 30vh 0;
 }
 
 .color-select-title {
+    display: block;
+    position: relative;
     text-align: center;
+    height: 40px;
     color: white;
+    margin: 0;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .color-select-div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     position: relative;
-    width: 250px;
-    height: auto;
-    bottom: 60vh;
+    margin-left: auto;
+    margin-right: auto;
+    width: 200px;
+    height: 40px;
+
+}
+
+.color-drop-div {
+    display: block;
+    height: 40px;
+    width: 40px;
+    margin-left: 20px;
+    background-color: rgb(58, 68, 95);
 }
 
 #color-selector {
     position: relative;
     display: block;
-    margin: auto;
     width: 100px;
 }
 
-.rangeContainer {
-    width: 300px;
+.range-container {
+    width: 200px;
     height: auto;
     position: relative;
     margin: auto;
-    top: -6vh;
 }
 
 .slider {
@@ -57,7 +90,7 @@ body {
     background-color: gray;
     border-radius: 5px;
     height: 10px;
-    width: 300px;
+    width: 200px;
 }
 
 #myRange {
@@ -80,7 +113,9 @@ body {
 }
 
 #size-input {
-    margin: auto;
+    margin: 0;
+    margin-left: auto;
+    margin-right: auto;
     display: block;
     position: relative;
 }
