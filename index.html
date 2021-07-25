@@ -16,6 +16,7 @@
         
         <div class='all-UI'>
             <div class='tool-panel'>
+                <h2 class='option-titles'>Canvas Size</h2>
                 <div class='range-container'>
                     <label for='box-range'>
                         <input name='box-range' type="range" min="2" max="90" value="4" class="slider" id="boxRange">
@@ -24,18 +25,30 @@
                 <div class='size-input-div'>
                     <input id='size-input' type="text" placeholder="Custom Size (1-100)">
                 </div>
-                <h2 class='color-select-title'>Color Selector:</h2>
+                <h2 class='option-titles' style='margin-bottom: -2px;'>Color Selector</h2>
                 <div class='color-select-div'>
                     <input id='color-selector' type='color' >
-                    <div class='color-drop-div'></div>
+                    <div class='tool-block'></div>
                 </div>
-                <div class='range-container'>
+                <h2 class='option-titles' style='margin-bottom: -3px; margin-top: -5px;'>Opacity</h2>
+                <div class='range-container' style='margin-top: 0; margin-bottom: 0;'>
                     <label for='opacity-range'>
                         <input name='box-range' type="range" min="0.1" max="1" value="0.1" class="slider" id="opacityRange" step=".01">
                     </label>
                 </div>
+                <div id='tools-flex-div'>
+                    <div class='tool-block'></div>
+                    <div class='tool-block'></div>
+                    <div class='tool-block'></div>
+                </div>
+                <div id='button-div'>
+                    <button id='rgb-button'>RGB</button>
+                    <button id='trail-button'>Trail Toggle</button>
+                    <button id='reset-button'>Reset</button>
+                </div>
+                
             </div>
-            <div id='canvas' draggable="false" ondragstart="return false;"></div>
+            <div id='canvas' draggable="false" ondragstart='return false;'></div>
             
         </div>
 

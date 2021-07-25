@@ -11,14 +11,30 @@ let setDivColorDefault = () => {
 
 setDivColorDefault();
 
+let sliderNum = 4; // Default size.
+let canvas = document.getElementById('canvas');
+
+// Setting up default size:
+let rowAndColumnNum = sliderNum;
+canvas.style.gridTemplateRows = `repeat(${rowAndColumnNum}, 1fr)`;
+canvas.style.gridTemplateColumns = `repeat(${rowAndColumnNum}, 1fr)`;
+for (k = 0; k < sliderNum ** 2; k++) {
+    let lilDiv = document.createElement('div');
+    lilDiv.id = `div${k}`;
+    lilDiv.style.cssText = `
+        background-color: white;
+        border: .1px solid #ededed;
+    `;
+    canvas.appendChild(lilDiv);
+}
 
 //Performace functions.
 function throttled(delay, fn) { // Helps reduce ammount of times color change/mouseenter event listener is called.
     let lastCall = 0;
     return function (...args) {
-      const now = (new Date).getTime();
+      const nowBigTime = (new Date);
+      const now = nowBigTime.getMilliseconds();
       if (now - lastCall < delay) {
-          console.log('delayed')
         return;
       }
       lastCall = now;
@@ -53,23 +69,6 @@ function throttled(delay, fn) { // Helps reduce ammount of times color change/mo
     };
 };
 
-let sliderNum = 4; // Default size.
-let canvas = document.getElementById('canvas');
-
-// Setting up default size:
-let rowAndColumnNum = sliderNum;
-canvas.style.gridTemplateRows = `repeat(${rowAndColumnNum}, 1fr)`;
-canvas.style.gridTemplateColumns = `repeat(${rowAndColumnNum}, 1fr)`;
-for (k = 0; k < sliderNum ** 2; k++) {
-    let lilDiv = document.createElement('div');
-    lilDiv.id = `div${k}`;
-    lilDiv.style.cssText = `
-        background-color: white;
-        border: .1px solid #ededed;
-    `;
-    canvas.appendChild(lilDiv);
-}
-
 //Event Functions.
 function hoverFunc(e) { //Changes the color of the div.
     let divColor = document.getElementById('color-selector');
@@ -81,10 +80,8 @@ let removalFunc = () => {
     // This is to show a separator when waiting.
     let prevDate = window.performance.now();
     limited(function() {
-        let difference;
-        difference = window.performance.now() - prevDate;
+        let difference = window.performance.now() - prevDate;
         prevDate = window.performance.now();
-        if (difference > 60) console.log('wait');
         //////////
         for (h = 0; h < canvas.childElementCount; h++) {
             canvas.children.item(h).removeEventListener('mouseenter', hoverFunc);
@@ -105,10 +102,11 @@ canvas.addEventListener('mousedown', function clickHoldFunc() {
         //////////
         for (h = 0; h < canvas.childElementCount; h++) {
             canvas.children.item(h).addEventListener('mouseenter', hoverFunc);
-            canvas.children.item(h).addEventListener('click', debounced(100, hoverFunc));
+            canvas.children.item(h).addEventListener('mousedown', hoverFunc);
+            canvas.children.item(h).addEventListener('click', debounced(50, hoverFunc));
         }
-        canvas.addEventListener('mouseup', throttled(200, removalFunc));
-        canvas.addEventListener('mouseleave', throttled(200, removalFunc));
+        canvas.addEventListener('mouseup', throttled(66, removalFunc));
+        canvas.addEventListener('mouseleave', throttled(66, removalFunc));
     })
 });
 
