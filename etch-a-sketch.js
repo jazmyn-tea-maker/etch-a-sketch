@@ -69,11 +69,54 @@ function throttled(delay, fn) { // Helps reduce ammount of times color change/mo
     };
 };
 
+let colorMode; // <-- used to set how the div changes color.
+
 //Event Functions.
-function hoverFunc(e) { //Changes the color of the div.
+let setDefaultColorMode = (e) => { //Default-- Sets color of div interacted with to the color selected.
     let divColor = document.getElementById('color-selector');
     e.target.style.backgroundColor = divColor.value;
 }
+document.getElementById('color-selector').addEventListener('change', function() {
+    colorMode = false;
+});
+
+
+let setTrailBrush = (e) => { // Sets an animation for the div interacted with so it looks like a 'trail'.
+    colorMode = 'trailbrush';
+    let style = document.getElementById('style');
+    let keyFrames = '\
+    @-moz-keyframes trail {\
+        0% {\
+            background-color: COLOR ;\
+        }\
+        100% {\
+            background-color: OGC ;\
+        }\
+    }';
+
+    let divColor = document.getElementById('color-selector');
+    let origBGColor = e.target.style.backgroundColor;
+    keyFrames = keyFrames.replace(/OGC/g, origBGColor);
+    keyFrames = keyFrames.replace(/COLOR/g, divColor.value);
+    let colorAnimAdd ='\
+    DIV_SELECTED {\
+        -moz-animation-name: trail;\
+        -moz-animation-duration: 2s;\
+        -moz-animation-timing function: ease-out;\
+    }'
+    let selectedDiv = `#${e.target.id}`;
+    colorAnimAdd = colorAnimAdd.replace(/DIV_SELECTED/g, selectedDiv);
+    style.innerHTML = style.innerHTML + keyFrames + colorAnimAdd;
+    console.log(style)
+}
+document.getElementById('trail-button').addEventListener('click', setTrailBrush);
+
+let setRbgBrush = (e) => { // Randomizes a color for the div interacted with.
+    colorMode = 'rgbbrush'
+    let colorVal = '#' + Math.floor(Math.random()*16777215).toString(16); // Returns random color.
+    e.target.style.backgroundColor = colorVal;
+}
+document.getElementById('rgb-button').addEventListener('click', setRbgBrush);
 
 let removalFunc = () => {
     let limited = factory(); //Constructor.
@@ -83,10 +126,23 @@ let removalFunc = () => {
         let difference = window.performance.now() - prevDate;
         prevDate = window.performance.now();
         //////////
-        for (h = 0; h < canvas.childElementCount; h++) {
-            canvas.children.item(h).removeEventListener('mouseenter', hoverFunc);
-            canvas.children.item(h).removeEventListener('click', hoverFunc);
+        if (!colorMode) {
+            for (h = 0; h < canvas.childElementCount; h++) {
+                canvas.children.item(h).removeEventListener('mouseenter', setDefaultColorMode);
+                canvas.children.item(h).removeEventListener('click', setDefaultColorMode);
+            }
+        } else if (colorMode == 'trailbrush') {
+            for (h = 0; h < canvas.childElementCount; h++) {
+                canvas.children.item(h).removeEventListener('mouseenter', setTrailBrush);
+                canvas.children.item(h).removeEventListener('click', setTrailBrush);
+            }
+        } else if (colorMode == 'rgbbrush') {
+            for (h = 0; h < canvas.childElementCount; h++) {
+                canvas.children.item(h).removeEventListener('mouseenter', setRbgBrush);
+                canvas.children.item(h).removeEventListener('click', setRbgBrush);
+            }
         }
+
     })
 }
 
@@ -99,16 +155,36 @@ canvas.addEventListener('mousedown', function clickHoldFunc() {
         difference = window.performance.now() - prevDate;
         prevDate = window.performance.now();
         if (difference < 30) console.log('wait');
-        //////////
-        for (h = 0; h < canvas.childElementCount; h++) {
-            canvas.children.item(h).addEventListener('mouseenter', hoverFunc);
-            canvas.children.item(h).addEventListener('mousedown', hoverFunc);
-            canvas.children.item(h).addEventListener('click', debounced(50, hoverFunc));
+        if (!colorMode) {
+            for (h = 0; h < canvas.childElementCount; h++) {
+                canvas.children.item(h).addEventListener('mouseenter', setDefaultColorMode);
+                canvas.children.item(h).addEventListener('mousedown', setDefaultColorMode);
+                canvas.children.item(h).addEventListener('click', debounced(50, setDefaultColorMode));
+            }
+            canvas.addEventListener('mouseup', throttled(66, removalFunc));
+            canvas.addEventListener('mouseleave', throttled(66, removalFunc));
+        } else if (colorMode == 'trailbrush') {
+            for (h = 0; h < canvas.childElementCount; h++) {
+                canvas.children.item(h).addEventListener('mouseenter', setTrailBrush);
+                canvas.children.item(h).addEventListener('mousedown', setTrailBrush);
+                canvas.children.item(h).addEventListener('click', debounced(50, setTrailBrush));
+            }
+            canvas.addEventListener('mouseup', throttled(66, removalFunc));
+            canvas.addEventListener('mouseleave', throttled(66, removalFunc));
+        } else if (colorMode == 'rgbbrush') {
+            for (h = 0; h < canvas.childElementCount; h++) {
+                canvas.children.item(h).addEventListener('mouseenter', setRbgBrush);
+                canvas.children.item(h).addEventListener('mousedown', setRbgBrush);
+                canvas.children.item(h).addEventListener('click', debounced(50, setRbgBrush));
+            }
+            canvas.addEventListener('mouseup', throttled(66, removalFunc));
+            canvas.addEventListener('mouseleave', throttled(66, removalFunc));
         }
-        canvas.addEventListener('mouseup', throttled(66, removalFunc));
-        canvas.addEventListener('mouseleave', throttled(66, removalFunc));
-    })
+
+    });
 });
+
+
 
 
 
