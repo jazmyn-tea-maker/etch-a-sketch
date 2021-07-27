@@ -168,6 +168,10 @@ body {
     animation: trail 1s ease-out forwards;
 }
 
+@keyframes trail {
+
+}
+
 .range-container {
     width: 200px;
     height: auto;
