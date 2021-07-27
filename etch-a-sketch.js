@@ -82,18 +82,14 @@ let removalFunc = () => {
         let difference = window.performance.now() - prevDate;
         prevDate = window.performance.now();
         //////////
-            for (h = 0; h < canvas.childElementCount; h++) {
-                canvas.children.item(h).removeEventListener('mouseenter', setDefaultColorMode);
-                canvas.children.item(h).removeEventListener('click', setDefaultColorMode);
-                //
-                canvas.children.item(h).removeEventListener('mouseenter', setTrailBrushProperties);
-                canvas.children.item(h).removeEventListener('click', setTrailBrushProperties);
-                //
-                canvas.children.item(h).removeEventListener('mouseenter', setRbgBrushProperties);
-                canvas.children.item(h).removeEventListener('click', setRbgBrushProperties);
-            }
-            setTimeout(function () {document.getElementById('style').innerHTML = '';}, 500);
-        });
+        for (h = 0; h < canvas.childElementCount; h++) {
+            let div = canvas.children.item(h);
+            let newDiv = div.cloneNode(true);
+            div.parentNode.replaceChild(newDiv, div);
+            console.log(document.getElementById('style'));
+        }
+        setTimeout(function () {document.getElementById('style').innerHTML = ''}, 400);
+    });
 };
 
 canvas.addEventListener('mousedown', function clickHoldFunc() {
@@ -104,8 +100,9 @@ canvas.addEventListener('mousedown', function clickHoldFunc() {
         let difference;
         difference = window.performance.now() - prevDate;
         prevDate = window.performance.now();
-        if (difference < 30) console.log('wait');
+        if (difference < 30) console.log('canvas wait');
         if (colorMode === 'default') {
+            document.getElementById('style').innerHTML = '';
             console.log(`Color mode is now ${colorMode}.`);
             for (h = 0; h < canvas.childElementCount; h++) {
                 canvas.children.item(h).addEventListener('mouseenter', setDefaultColorMode);
@@ -127,6 +124,7 @@ canvas.addEventListener('mousedown', function clickHoldFunc() {
 let setDefaultColorMode = (e) => { //Default-- Sets color of div interacted with to the color selected.
     let divColor = document.getElementById('color-selector');
     e.target.style.backgroundColor = divColor.value;
+    console.log(e.target);
 };
 
 let backToDefault = () => {
@@ -155,7 +153,7 @@ let setTrailBrushProperties = (e) => { // Sets an animation for the div interact
     let colorAnimAdd ='\
     DIV_SELECTED {\
         animation-name: trail;\
-        animation-duration: .5s;\
+        animation-duration: 1s;\
         animation-timing function: ease-out;\
     }'
     let selectedDivId = `#${e.target.id}`;
@@ -171,16 +169,29 @@ let setTrailBrush = () => {
         let difference;
         difference = window.performance.now() - prevDate;
         prevDate = window.performance.now();
-        if (difference < 30) console.log('wait');
+        if (difference < 30) console.log('trail wait');
         for (h = 0; h < canvas.childElementCount; h++) {
             canvas.children.item(h).addEventListener('mouseenter', setTrailBrushProperties);
             canvas.children.item(h).addEventListener('mousedown', setTrailBrushProperties);
-            canvas.children.item(h).addEventListener('click', setTrailBrushProperties);
+            canvas.children.item(h).addEventListener('click', debounced(50, setTrailBrushProperties));
         }
+        
         canvas.addEventListener('mouseup', throttled(66, removalFunc));
         canvas.addEventListener('mouseleave', throttled(66, removalFunc));
     }));
 };
+
+//Okokok.
+//When an animation is finished, ONLY THEN can the div's styling be cleared.
+    //How do I detect whether or not an animation cycle is complete?
+        
+    //How do I clear only that div's styling?
+//Animation restarts even if it's mid completion when a user interacts with it.
+    //How to make mouseenter event restart the div's animation?
+        //Detect animation cycle percentage, or make a loop of some kind, and 
+        //reset the percentage back to 0%.
+    //Where do I put this?
+        //Within the mouseleave event in the set functions.
 
 let setColorModeTrail = () => {
     colorMode = 'trailbrush';
@@ -197,11 +208,11 @@ let setRbgBrush = () => {
     let limited = factory(); //Constructor.
     // This is to show a separator when waiting.
     let prevDate = window.performance.now();
-    limited(function() {
+    canvas.addEventListener('mousedown', limited(function() {
         let difference;
         difference = window.performance.now() - prevDate;
         prevDate = window.performance.now();
-        if (difference < 30) console.log('wait');
+        if (difference < 30) console.log('rgb wait');
         for (h = 0; h < canvas.childElementCount; h++) {
             canvas.children.item(h).addEventListener('mouseenter', setRbgBrushProperties);
             canvas.children.item(h).addEventListener('mousedown', setRbgBrushProperties);
@@ -209,8 +220,8 @@ let setRbgBrush = () => {
         }
         canvas.addEventListener('mouseup', throttled(66, removalFunc));
         canvas.addEventListener('mouseleave', throttled(66, removalFunc));
-    });    
-};
+        })
+    )};
 
 let setColorModeRgb = () => {
     colorMode = 'rgbbrush';
@@ -266,5 +277,5 @@ slider.addEventListener('input', changeCanvasSize = () => {
         `;
         canvas.appendChild(lilDiv);
     }
-    
+
 });
