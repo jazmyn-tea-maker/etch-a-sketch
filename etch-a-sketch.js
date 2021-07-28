@@ -136,6 +136,14 @@ let backToDefault = () => {
 let pencilTool = document.getElementById('pencil');
 pencilTool.addEventListener('click', backToDefault);
 
+let eraseFunc = () => {
+    let divColor = document.getElementById('color-selector');
+    divColor.value = '#FFFFFF';
+}
+
+let eraserTool = document.getElementById('eraser');
+eraserTool.addEventListener('click', eraseFunc);
+
 let setTrailBrushProperties = (e) => { // Sets an animation for the div interacted with so it looks like a 'trail'.
     let style = document.getElementById('style');
     let keyFrames = '\
@@ -221,19 +229,19 @@ document.getElementById('rgb-button').addEventListener('click', setColorModeRgb)
 let resetCanvasProperties = () => {
     let style = document.getElementById('style');
     let keyFrames = '\
-    @keyframes trail {\
-        100% {\
-            background-color: white ;\
-        }\
-    }';
+        @keyframes trail {\
+            100% {\
+                background-color: white ;\
+            }\
+        }';
     for (h = 0; h < canvas.childElementCount; h++) {
         let div = canvas.children.item(h);
         let resetAnim =`
-        #${div.id} {
-            animation-name: trail;
-            animation-duration: 1s;
-            animation-timing function: ease-out;
-        }`
+            #${div.id} {
+                animation-name: trail;
+                animation-duration: 1s;
+                animation-timing function: ease-out;
+            }`
         style.innerHTML = style.innerHTML + keyFrames + resetAnim;
     }
     setTimeout(function () {
