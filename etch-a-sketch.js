@@ -112,10 +112,15 @@ let clickHoldFunc = () => {
             }
             canvas.addEventListener('mouseup', throttled(66, removalFunc));
             canvas.addEventListener('mouseleave', throttled(66, removalFunc));
-        } if (colorMode === 'trailbrush') {
+        } 
+        if (colorMode === 'trailbrush') {
             setTrailBrush();
-        } else if (colorMode === 'rgbbrush') {
+        }
+        if (colorMode === 'rgbbrush') {
             setRbgBrush();
+        }
+        if (colorMode === 'eraser') {
+            eraseFunc();
         }
     })
 }
@@ -136,13 +141,55 @@ let backToDefault = () => {
 let pencilTool = document.getElementById('pencil');
 pencilTool.addEventListener('click', backToDefault);
 
+let eraserColorModeSet = () => {
+    colorMode = 'eraser';
+}
+
+let eraserProps = (e) => {
+    e.target.style.backgroundColor = '#FFFFFF';
+}
+
 let eraseFunc = () => {
-    let divColor = document.getElementById('color-selector');
-    divColor.value = '#FFFFFF';
+    let limited = factory(); //Constructor.
+    // This is to show a separator when waiting.
+    let prevDate = window.performance.now();
+    limited(function() {
+        let difference = window.performance.now() - prevDate;
+        prevDate = window.performance.now();
+        //////////
+        for (h = 0; h < canvas.childElementCount; h++) {
+            canvas.children.item(h).addEventListener('mouseenter', eraserProps);
+            canvas.children.item(h).addEventListener('mousedown', eraserProps);
+            canvas.children.item(h).addEventListener('click', debounced(50, eraserProps));
+        }
+        canvas.addEventListener('mouseup', throttled(66, removalFunc));
+        canvas.addEventListener('mouseleave', throttled(66, removalFunc));
+    })
+        
 }
 
 let eraserTool = document.getElementById('eraser');
-eraserTool.addEventListener('click', eraseFunc);
+eraserTool.addEventListener('click', eraserColorModeSet);
+
+//Next task: Fill bucket.
+//How: Starting with the div selected, check the next
+//one's color. If it's the same, make that one the same color
+//as the last. (The color selected.)
+
+//First instinct is to go up from the selection point.
+//It'll go until the next div is not the same color. (NO color changing at this point.)
+//Then it'll check left AND up until there is a div that's NOT the same color.
+//Now it'll go right and change the last div's color whilst moving right.
+//until finding a div not of the same color. Then it'll check down.
+//If down is the same color, then it'll move left until it hits one that's not the same color. 
+//Only when moving right or down will the last div's color be changed.
+//Continue until there is a div not of the same color as the one up, left, right, or down.
+//At that point, change that div to the color selected and end the function.
+
+//Second to last task: ink dropper. Selects a div and changes the color selector value to 
+//that div's background color. Simple, easy.
+
+//Last task: media query for mobile.
 
 let setTrailBrushProperties = (e) => { // Sets an animation for the div interacted with so it looks like a 'trail'.
     let style = document.getElementById('style');
