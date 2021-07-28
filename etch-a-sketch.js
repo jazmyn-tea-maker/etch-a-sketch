@@ -23,7 +23,6 @@ for (k = 0; k < sliderNum ** 2; k++) {
     let lilDiv = document.createElement('div');
     lilDiv.id = `div${k}`;
     lilDiv.style.cssText = `
-        display: block;
         background-color: white;
         border: .1px solid #ededed;
     `;
@@ -71,7 +70,7 @@ function factory() { // Function call limiter. Only applied to event listener re
     }
 };
 
-let colorMode = 'default'; // <-- used to set how the div changes color.
+let colorMode = 'default'; // Used to set how the div changes color.
 
 let removalFunc = () => {
     let limited = factory(); //Constructor.
@@ -121,10 +120,9 @@ let clickHoldFunc = () => {
     })
 }
 
+//Event Functions.
 canvas.addEventListener('mousedown', clickHoldFunc);
 
-
-//Event Functions.
 let setDefaultColorMode = (e) => { //Default-- Sets color of div interacted with to the color selected.
     let divColor = document.getElementById('color-selector');
     e.target.style.backgroundColor = divColor.value;
@@ -160,19 +158,27 @@ let setTrailBrushProperties = (e) => { // Sets an animation for the div interact
         animation-timing function: ease-out;
     }`
     style.innerHTML = style.innerHTML + keyFrames + colorAnimAdd;
-    console.log(e.target);
 };
 
 let setTrailBrush = () => {
-    for (h = 0; h < canvas.childElementCount; h++) {
-        let div = canvas.children.item(h);
-        div.addEventListener('mouseenter', setTrailBrushProperties);
-        div.addEventListener('mousedown', setTrailBrushProperties);
-        div.addEventListener('click', debounced(50, setTrailBrushProperties));
-    }
-    
-    canvas.addEventListener('mouseup', throttled(66, removalFunc));
-    canvas.addEventListener('mouseleave', throttled(66, removalFunc));
+
+    let limited = factory(); //Constructor.
+    // This is to show a separator when waiting.
+    let prevDate = window.performance.now();
+    limited(function() {
+        let difference = window.performance.now() - prevDate;
+        prevDate = window.performance.now();
+        //////////
+        for (h = 0; h < canvas.childElementCount; h++) {
+            let div = canvas.children.item(h);
+            div.addEventListener('mouseenter', setTrailBrushProperties);
+            div.addEventListener('mousedown', setTrailBrushProperties);
+            div.addEventListener('click', debounced(50, setTrailBrushProperties));
+        }
+        canvas.addEventListener('mouseup', throttled(66, removalFunc));
+        canvas.addEventListener('mouseleave', throttled(66, removalFunc));
+    })
+
 };
 
 let setColorModeTrail = () => {
@@ -187,6 +193,14 @@ let setRbgBrushProperties = (e) => { // Randomizes a color for the div interacte
 };
 
 let setRbgBrush = () => {
+
+    let limited = factory(); //Constructor.
+    // This is to show a separator when waiting.
+    let prevDate = window.performance.now();
+    limited(function() {
+        let difference = window.performance.now() - prevDate;
+        prevDate = window.performance.now();
+        //////////
         for (h = 0; h < canvas.childElementCount; h++) {
             canvas.children.item(h).addEventListener('mouseenter', setRbgBrushProperties);
             canvas.children.item(h).addEventListener('mousedown', setRbgBrushProperties);
@@ -194,6 +208,8 @@ let setRbgBrush = () => {
         }
         canvas.addEventListener('mouseup', throttled(66, removalFunc));
         canvas.addEventListener('mouseleave', throttled(66, removalFunc));
+    })
+        
 };
 
 let setColorModeRgb = () => {
@@ -201,6 +217,39 @@ let setColorModeRgb = () => {
     console.log(`Color mode is now ${colorMode}.`);
 }
 document.getElementById('rgb-button').addEventListener('click', setColorModeRgb);
+
+let resetCanvasProperties = () => {
+    let style = document.getElementById('style');
+    let keyFrames = '\
+    @keyframes trail {\
+        100% {\
+            background-color: white ;\
+        }\
+    }';
+    for (h = 0; h < canvas.childElementCount; h++) {
+        let div = canvas.children.item(h);
+        let resetAnim =`
+        #${div.id} {
+            animation-name: trail;
+            animation-duration: 1s;
+            animation-timing function: ease-out;
+        }`
+        style.innerHTML = style.innerHTML + keyFrames + resetAnim;
+    }
+    setTimeout(function () {
+        for (h = 0; h < canvas.childElementCount; h++) {
+            let div = canvas.children.item(h);
+            let replacementDiv = document.getElementById('replacement-div');
+            newDiv = replacementDiv.cloneNode(true);
+            newDiv.style.display = 'block';
+            newDiv.id = div.id;
+            newDiv.style.backgroundColor = 'white';
+            div.parentNode.replaceChild(newDiv, div);
+        }
+    }, 1000)
+}
+
+document.getElementById('reset-button').addEventListener('click', resetCanvasProperties);
 
 let userInput = document.getElementById('size-input');
 // If the user inputs text, use that.
