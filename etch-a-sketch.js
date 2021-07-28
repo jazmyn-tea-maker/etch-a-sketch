@@ -125,31 +125,7 @@ let clickHoldFunc = () => {
     })
 }
 
-//Event Functions.
-canvas.addEventListener('mousedown', clickHoldFunc);
-
-let setDefaultColorMode = (e) => { //Default-- Sets color of div interacted with to the color selected.
-    let divColor = document.getElementById('color-selector');
-    e.target.style.backgroundColor = divColor.value;
-};
-
-let backToDefault = () => {
-    colorMode = 'default';
-    console.log(`Color mode is now ${colorMode}.`);
-};
-
-let pencilTool = document.getElementById('pencil');
-pencilTool.addEventListener('click', backToDefault);
-
-let eraserColorModeSet = () => {
-    colorMode = 'eraser';
-}
-
-let eraserProps = (e) => {
-    e.target.style.backgroundColor = '#FFFFFF';
-}
-
-let eraseFunc = () => {
+let setUpEventListenersFunc = (propsFunc) => {
     let limited = factory(); //Constructor.
     // This is to show a separator when waiting.
     let prevDate = window.performance.now();
@@ -158,18 +134,54 @@ let eraseFunc = () => {
         prevDate = window.performance.now();
         //////////
         for (h = 0; h < canvas.childElementCount; h++) {
-            canvas.children.item(h).addEventListener('mouseenter', eraserProps);
-            canvas.children.item(h).addEventListener('mousedown', eraserProps);
-            canvas.children.item(h).addEventListener('click', debounced(50, eraserProps));
+            canvas.children.item(h).addEventListener('mouseenter', propsFunc);
+            canvas.children.item(h).addEventListener('mousedown', propsFunc);
+            canvas.children.item(h).addEventListener('click', debounced(50, propsFunc));
         }
         canvas.addEventListener('mouseup', throttled(66, removalFunc));
         canvas.addEventListener('mouseleave', throttled(66, removalFunc));
     })
-        
+}
+
+//Event Functions.
+canvas.addEventListener('mousedown', clickHoldFunc);
+
+let setDefaultColorMode = (e) => { //Default-- Sets color of div interacted with to the color selected.
+    let divColor = document.getElementById('color-selector');
+    e.target.style.backgroundColor = divColor.value;
+};
+
+let pencilTool = document.getElementById('pencil');
+pencilTool.addEventListener('click', function backToDefault () {
+    colorMode = 'default';
+    console.log(`Color mode is now ${colorMode}.`);
+});
+
+let eraserProperties = (e) => {
+    e.target.style.backgroundColor = '#FFFFFF';
+}
+
+let eraseFunc = () => {
+    setUpEventListenersFunc(eraserProperties);     
 }
 
 let eraserTool = document.getElementById('eraser');
-eraserTool.addEventListener('click', eraserColorModeSet);
+eraserTool.addEventListener('click', function() {
+    colorMode = 'eraser';
+});
+
+let fillProperties = () => {
+    
+}
+
+let fillFunc = () => {
+
+}
+
+let fillBucketTool = document.getElementById('fill-bucket');
+fillBucketTool.addEventListener('click', function () {
+    colorMode = 'fill';
+})
 
 //Next task: Fill bucket.
 //How: Starting with the div selected, check the next
@@ -216,31 +228,13 @@ let setTrailBrushProperties = (e) => { // Sets an animation for the div interact
 };
 
 let setTrailBrush = () => {
-
-    let limited = factory(); //Constructor.
-    // This is to show a separator when waiting.
-    let prevDate = window.performance.now();
-    limited(function() {
-        let difference = window.performance.now() - prevDate;
-        prevDate = window.performance.now();
-        //////////
-        for (h = 0; h < canvas.childElementCount; h++) {
-            let div = canvas.children.item(h);
-            div.addEventListener('mouseenter', setTrailBrushProperties);
-            div.addEventListener('mousedown', setTrailBrushProperties);
-            div.addEventListener('click', debounced(50, setTrailBrushProperties));
-        }
-        canvas.addEventListener('mouseup', throttled(66, removalFunc));
-        canvas.addEventListener('mouseleave', throttled(66, removalFunc));
-    })
-
+    setUpEventListenersFunc(setTrailBrushProperties);     
 };
 
-let setColorModeTrail = () => {
+document.getElementById('trail-button').addEventListener('click', function () {
     colorMode = 'trailbrush';
     console.log(`Color mode is now ${colorMode}.`);
-}
-document.getElementById('trail-button').addEventListener('click', setColorModeTrail);
+});
 
 let setRbgBrushProperties = (e) => { // Randomizes a color for the div interacted with.
     let colorVal = '#' + Math.floor(Math.random()*16777215).toString(16); // Returns random color.
@@ -248,35 +242,18 @@ let setRbgBrushProperties = (e) => { // Randomizes a color for the div interacte
 };
 
 let setRbgBrush = () => {
-
-    let limited = factory(); //Constructor.
-    // This is to show a separator when waiting.
-    let prevDate = window.performance.now();
-    limited(function() {
-        let difference = window.performance.now() - prevDate;
-        prevDate = window.performance.now();
-        //////////
-        for (h = 0; h < canvas.childElementCount; h++) {
-            canvas.children.item(h).addEventListener('mouseenter', setRbgBrushProperties);
-            canvas.children.item(h).addEventListener('mousedown', setRbgBrushProperties);
-            canvas.children.item(h).addEventListener('click', debounced(50, setRbgBrushProperties));
-        }
-        canvas.addEventListener('mouseup', throttled(66, removalFunc));
-        canvas.addEventListener('mouseleave', throttled(66, removalFunc));
-    })
-        
+    setUpEventListenersFunc(setRbgBrushProperties);     
 };
 
-let setColorModeRgb = () => {
+document.getElementById('rgb-button').addEventListener('click', function () {
     colorMode = 'rgbbrush';
     console.log(`Color mode is now ${colorMode}.`);
-}
-document.getElementById('rgb-button').addEventListener('click', setColorModeRgb);
+});
 
 let resetCanvasProperties = () => {
     let style = document.getElementById('style');
     let keyFrames = '\
-        @keyframes trail {\
+        @keyframes reset {\
             100% {\
                 background-color: white ;\
             }\
@@ -285,19 +262,19 @@ let resetCanvasProperties = () => {
         let div = canvas.children.item(h);
         let resetAnim =`
             #${div.id} {
-                animation-name: trail;
+                animation-name: reset;
                 animation-duration: 1s;
                 animation-timing function: ease-out;
             }`
         style.innerHTML = style.innerHTML + keyFrames + resetAnim;
     }
     setTimeout(function () {
-        for (h = 0; h < canvas.childElementCount; h++) {
+        for (h = 0; h < canvas.childElementCount; h++) { //Replaces all divs with clean ones.
+            let replacementDiv = document.getElementById('replacement-div'); //Made a 'replacement' example that
+            newDiv = replacementDiv.cloneNode(true);                         //is set to display: none so that I have an invisible
+            newDiv.style.display = 'block';                                  //template for the new divs that ARE visible.
             let div = canvas.children.item(h);
-            let replacementDiv = document.getElementById('replacement-div');
-            newDiv = replacementDiv.cloneNode(true);
-            newDiv.style.display = 'block';
-            newDiv.id = div.id;
+            newDiv.id = div.id; 
             newDiv.style.backgroundColor = 'white';
             div.parentNode.replaceChild(newDiv, div);
         }
