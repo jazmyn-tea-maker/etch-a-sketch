@@ -12,6 +12,11 @@ let setDivColorDefault = () => {
 
 setDivColorDefault();
 
+let setDefaultColorMode = (e) => { //Default-- Sets color of div interacted with to the color selected.
+    let divColor = document.getElementById('color-selector').value;
+    e.target.style.backgroundColor = divColor;
+};
+
 let sliderNum = 4; // Default size.
 let canvas = document.getElementById('canvas');
 
@@ -23,9 +28,10 @@ for (k = 0; k < sliderNum ** 2; k++) {
     let lilDiv = document.createElement('div');
     lilDiv.id = `div${k}`;
     lilDiv.style.cssText = `
-        background-color: white;
+        background-color: #FFFFFF;
         border: .1px solid #ededed;
     `;
+    lilDiv.onclick = 'e.stopPropagation();'
     canvas.appendChild(lilDiv);
 }
 
@@ -43,7 +49,7 @@ function throttled(delay, fn) { // Helps reduce ammount of times color change/mo
     }
 }
 
-  function debounced(delay, fn) { // Helps reduces amount of click event listener calls.
+function debounced(delay, fn) { // Helps reduces amount of click event listener calls.
     let timerId;
     return function (...args) {
       if (timerId) {
@@ -54,7 +60,7 @@ function throttled(delay, fn) { // Helps reduce ammount of times color change/mo
         timerId = null;
       }, delay);
     }
-  }
+}
 
 function factory() { // Function call limiter. Only applied to event listener removal function.
     let time = 0, count = 0, difference = 0, queue = [];
@@ -73,42 +79,46 @@ function factory() { // Function call limiter. Only applied to event listener re
 let colorMode = 'default'; // Used to set how the div changes color.
 
 let removalFunc = () => {
-    let limited = factory(); //Constructor.
-    // This is to show a separator when waiting.
-    let prevDate = window.performance.now();
-    limited(function() {
-        let difference = window.performance.now() - prevDate;
-        prevDate = window.performance.now();
-        //////////
-        for (h = 0; h < canvas.childElementCount; h++) {
-            let div = canvas.children.item(h);
-            let replacementDiv = document.getElementById('replacement-div');
-            newDiv = replacementDiv.cloneNode(true);
-            newDiv.style.display = 'block';
-            newDiv.id = div.id;
-            newDiv.style.backgroundColor = div.style.backgroundColor;
-            div.parentNode.replaceChild(newDiv, div);
-        }
-        setTimeout(function () {document.getElementById('style').innerHTML = ''}, 400);
-    });
+   setTimeout(function () {
+       let limited = factory(); //Constructor.
+        // This is to show a separator when waiting.
+        let prevDate = window.performance.now();
+        limited(function() {
+            let difference = window.performance.now() - prevDate;
+            prevDate = window.performance.now();
+            //////////
+            for (h = 0; h < canvas.childElementCount; h++) {
+                let div = canvas.children.item(h);
+                let replacementDiv = document.getElementById('replacement-div');
+                newDiv = replacementDiv.cloneNode(true);
+                newDiv.style.display = 'block';
+                newDiv.id = div.id;
+                newDiv.style.backgroundColor = div.style.backgroundColor;
+                div.parentNode.replaceChild(newDiv, div);
+            }
+            setTimeout(function () {document.getElementById('style').innerHTML = ''}, 300);
+        })
+    }, 100);
 };
+
 
 let clickHoldFunc = () => {
     let limited = factory(); //Constructor.
     // This is to show a separator when waiting.
     let prevDate = window.performance.now();
     limited(function() {
-        let difference;
-        difference = window.performance.now() - prevDate;
         prevDate = window.performance.now();
+        let difference = window.performance.now() - prevDate;
+        console.log(difference);
+        console.log(prevDate);
         if (difference < 30) console.log('canvas wait');
         if (colorMode === 'default') {
             document.getElementById('style').innerHTML = '';
             console.log(`Color mode is now ${colorMode}.`);
             for (h = 0; h < canvas.childElementCount; h++) {
+                canvas.children.item(h).addEventListener('click', debounced(50, setDefaultColorMode));
                 canvas.children.item(h).addEventListener('mouseenter', setDefaultColorMode);
                 canvas.children.item(h).addEventListener('mousedown', setDefaultColorMode);
-                canvas.children.item(h).addEventListener('click', setDefaultColorMode);
             }
             canvas.addEventListener('mouseup', throttled(66, removalFunc));
             canvas.addEventListener('mouseleave', throttled(66, removalFunc));
@@ -122,34 +132,27 @@ let clickHoldFunc = () => {
         if (colorMode === 'eraser') {
             eraseFunc();
         }
+        if (colorMode === 'fill'){
+            fillFunc();
+        }
     })
 }
 
 let setUpEventListenersFunc = (propsFunc) => {
-    let limited = factory(); //Constructor.
-    // This is to show a separator when waiting.
-    let prevDate = window.performance.now();
-    limited(function() {
-        let difference = window.performance.now() - prevDate;
-        prevDate = window.performance.now();
-        //////////
-        for (h = 0; h < canvas.childElementCount; h++) {
-            canvas.children.item(h).addEventListener('mouseenter', propsFunc);
-            canvas.children.item(h).addEventListener('mousedown', propsFunc);
-            canvas.children.item(h).addEventListener('click', debounced(50, propsFunc));
-        }
-        canvas.addEventListener('mouseup', throttled(66, removalFunc));
-        canvas.addEventListener('mouseleave', throttled(66, removalFunc));
-    })
+    for (h = 0; h < canvas.childElementCount; h++) {
+        canvas.children.item(h).addEventListener('click', debounced(50, propsFunc));
+        canvas.children.item(h).addEventListener('mouseenter', propsFunc);
+        canvas.children.item(h).addEventListener('mousedown', propsFunc);
+    }
+    canvas.addEventListener('mouseup', throttled(66, removalFunc));
+    canvas.addEventListener('mouseleave', throttled(66, removalFunc));
 }
 
 //Event Functions.
 canvas.addEventListener('mousedown', clickHoldFunc);
 
-let setDefaultColorMode = (e) => { //Default-- Sets color of div interacted with to the color selected.
-    let divColor = document.getElementById('color-selector');
-    e.target.style.backgroundColor = divColor.value;
-};
+
+
 
 let pencilTool = document.getElementById('pencil');
 pencilTool.addEventListener('click', function backToDefault () {
@@ -170,12 +173,39 @@ eraserTool.addEventListener('click', function() {
     colorMode = 'eraser';
 });
 
-let fillProperties = () => {
-    
+let fillProperties = (e) => {
+    let divColor = e.target.style['background-color'];
+    let divNum = e.target.id;
+    let letterReg = /[^0-9]/g
+    divNum = parseInt(divNum.replace(letterReg, ''));
+    let fillColor = document.getElementById('color-selector').value
+    for (i = 0; i < canvas.childElementCount; i++) {
+        let checkLeft = () => {
+            let leftDiv = document.getElementById(`div${divNum - 1}`);
+        }
+        let checkUp = () => {
+            if (true) {
+                let upRow = divNum - rowAndColumnNum;
+                if (upRow >= 0) {
+                    let nextUp = document.getElementById(`div${upRow}`);
+                    if (nextUp.style['background-color'] == divColor) {
+                        divColor = fillColor;
+                        console.log(e.target);
+                        checkUp();
+                    } else {
+                        checkLeft();
+                    }
+                }
+                
+            }
+        }
+        checkUp();
+        
+    }
 }
 
 let fillFunc = () => {
-
+    setUpEventListenersFunc(fillProperties);
 }
 
 let fillBucketTool = document.getElementById('fill-bucket');
@@ -255,7 +285,7 @@ let resetCanvasProperties = () => {
     let keyFrames = '\
         @keyframes reset {\
             100% {\
-                background-color: white ;\
+                background-color: #FFFFFF ;\
             }\
         }';
     for (h = 0; h < canvas.childElementCount; h++) {
@@ -275,7 +305,7 @@ let resetCanvasProperties = () => {
             newDiv.style.display = 'block';                                  //template for the new divs that ARE visible.
             let div = canvas.children.item(h);
             newDiv.id = div.id; 
-            newDiv.style.backgroundColor = 'white';
+            newDiv.style.backgroundColor = '#FFFFFF';
             div.parentNode.replaceChild(newDiv, div);
         }
     }, 1000)
@@ -293,7 +323,7 @@ userInput.addEventListener('keydown', userCustomSize = (e) => {
         if (userInputSize >= 91) {
             userInputSize = 90;
         }
-            let rowAndColumnNum = userInputSize;
+            rowAndColumnNum = userInputSize;
             canvas.style.gridTemplateRows = `repeat(${rowAndColumnNum}, 1fr)`;
             canvas.style.gridTemplateColumns = `repeat(${rowAndColumnNum}, 1fr)`;
             canvas.innerHTML = '';
@@ -301,12 +331,13 @@ userInput.addEventListener('keydown', userCustomSize = (e) => {
                 let lilDiv = document.createElement('div');
                 lilDiv.id = `div${i}`;
                 lilDiv.style.cssText = `
-                    background-color: white;
+                    background-color: #FFFFFF;
                     border: .1px solid #ededed;
                 `;
-                
+                lilDiv.onclick = 'e.stopPropagation();'
                 canvas.appendChild(lilDiv);
             }
+        
         userInput.value = ''; // Clears text input
     }
 
@@ -318,7 +349,7 @@ let slider = document.getElementById('boxRange');
 slider.addEventListener('input', changeCanvasSize = () => {
 
     sliderNum = document.getElementById('boxRange').value;
-    let rowAndColumnNum = sliderNum;
+    rowAndColumnNum = sliderNum;
     canvas.style.gridTemplateRows = `repeat(${rowAndColumnNum}, 1fr)`;
     canvas.style.gridTemplateColumns = `repeat(${rowAndColumnNum}, 1fr)`;
     canvas.innerHTML = '';
@@ -326,9 +357,10 @@ slider.addEventListener('input', changeCanvasSize = () => {
         let lilDiv = document.createElement('div');
         lilDiv.id = `div${i}`;
         lilDiv.style.cssText = `
-            background-color: white;
+            background-color: #FFFFFF;
             border: .1px solid #ededed;
         `;
+        lilDiv.onclick = 'e.stopPropagation();'
         canvas.appendChild(lilDiv);
     }
 
