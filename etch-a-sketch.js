@@ -179,13 +179,31 @@ let fillProperties = (e) => {
     divNum = parseInt(divNum.replace(letterReg, ''));
     let fillColor = document.getElementById('color-selector').value
 
-    let checkUp = (upNum) => { //Checks colors of divs above and moves up until there isn't one of the same color.
-        let upRow = upNum - rowAndColumnNum; //The number of divs in each row, so 
-        upNum = upRow;                      //we move backwards that many places
+    let checkLeft = (leftNum) => {
+        leftNum -= 1;
+        while (leftNum > 0) {
+            let leftDiv = document.getElementById(`div${leftNum}`);
+            if (leftDiv.style.backgroundColor == div.style.backgroundColor && (leftNum - 1) >= 0) { //Checks upNum (div id) to make sure
+                leftNum--;                                                    //it exists. Negative id doesn't exist.
+                leftDiv = document.getElementById(`div${leftNum}`);
+                let divBefore = document.getElementById(`div${leftNum + 1}`);
+                if (!(divBefore.style.backgroundColor == leftDiv.style.backgroundColor)) {
+                    leftDiv = divBefore;
+                }
+                console.log(leftDiv);
+            } else {
+                leftNum = -1;
+            }
+        } 
+    }
+
+    let checkUp = (upNum) => {              //Checks colors of divs above and moves up until there isn't one of the same color.
+                                            //The number of divs in each row, so 
+        upNum -= rowAndColumnNum;           //we move backwards that many places
         while (upNum > 0) {                 //Until we've selected to next one up.
             let nextUp = document.getElementById(`div${upNum}`);
             if (nextUp.style.backgroundColor == div.style.backgroundColor && upNum >= rowAndColumnNum) { //Checks upNum (div id) to make sure
-                upNum = upNum - rowAndColumnNum;                                                         //it exists. Negative id doesn't exist.
+                upNum -= rowAndColumnNum;                                                         //it exists. Negative id doesn't exist.
                 nextUp = document.getElementById(`div${upNum}`);
                 let currentSelect = document.getElementById(`div${upNum + rowAndColumnNum}`); //Stops on the inside of a 'div'. 
                 if (currentSelect.style.backgroundColor == nextUp.style.backgroundColor) { //Used to stop on the 'outline'. Take it out and see.
@@ -199,7 +217,9 @@ let fillProperties = (e) => {
         } 
     }
                     // Put this is down and right funcs >> div.style.cssText = `background-color: ${fillColor}; border: .1px solid #ededed; display: none;`
-    checkUp(divNum);
+   // checkUp(divNum);
+   checkLeft(divNum);
+
 }
 
 let fillFunc = () => {
