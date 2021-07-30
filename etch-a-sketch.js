@@ -178,57 +178,107 @@ let fillProperties = (e) => {
     //Have to get how many elements are in one row.
     //It's stuck in a string, as you can tell.
     let rowAndColumnNum = canvas.style.gridTemplateRows;
-    rowAndColumnNum = rowAndColumnNum.split(/[,\(]/g);
+    rowAndColumnNum = rowAndColumnNum.split(/[,\(]/g); //Takes out comma and parenthese surrounding the number needed.
     rowAndColumnNum = parseInt(rowAndColumnNum[1]);
-    console.log(rowAndColumnNum);
 
     let div = e.target;
     let divNum = e.target.id;
     let letterReg = /[^0-9]/g
-    divNum = parseInt(divNum.replace(letterReg, ''));
+    divNum = parseInt(divNum.replace(letterReg, '')); //Takes number out of the div's id to be used in loop.
     let fillColor = document.getElementById('color-selector').value
+    
+    //Function order: Check up, check left, check right, 
+
+    let checkRightAndUp = (num) => {
+        let rightId = num;
+        let upRowNum = num - rowAndColumnNum;
+        let selectedDiv = document.getElementById(`div${num}`);
+        let rightDiv = document.getElementById(`div${rightId + 1}`);
+        let upDiv = document.getElementById(`div${upRowNum}`);
+        //First instinct is always to check up first.
+        let rightFunc = () => {
+            while (rightId < divNum) {
+                if (rightDiv.style.backgroundColor == selectedDiv.style.backgroundColor) {
+                    selectedDiv.style.backgroundColor = fillColor;
+                    selectedDiv = rightDiv;
+                    rightId++;
+                } else {
+                    upFunc();
+                }
+                if (!(selectedDiv.style.backgroundColor == upDiv.style.backgroundColor) && !(rightDiv.style.backgroundColor == selectedDiv.style.backgroundColor)) {
+                    return;
+                }
+            }
+        }
+        let upFunc = () => {
+            if (selectedDiv.style.backgroundColor == upDiv.style.backgroundColor) {
+                while (upRowNum > 0) {
+                    upRowNum -= rowAndColumnNum;                                             
+                    if (selectedDiv.style.backgroundColor == upDiv.style.backgroundColor) { 
+                        selectedDiv = upDiv;
+                    } else {
+                        rightFunc();
+                    }
+                    if (!(selectedDiv.style.backgroundColor == upDiv.style.backgroundColor) && !(rightDiv.style.backgroundColor == selectedDiv.style.backgroundColor)) {
+                        return;
+                    }
+                }
+            }
+        }
+        upFunc();
+    }
 
     let checkLeft = (leftNum) => {
+        let finalDiv;
         leftNum -= 1;
         let leftDiv = document.getElementById(`div${leftNum}`);
         while (leftNum > 0) {
             if (leftDiv.style.backgroundColor == div.style.backgroundColor && (leftNum - 1) >= 0) { //Checks upNum (div id) to make sure
                 leftNum--;                                                                         //it exists. Negative id doesn't exist.
                 leftDiv = document.getElementById(`div${leftNum}`);
-                let finalDiv = document.getElementById(`div${leftNum + 1}`);
+                finalDiv = document.getElementById(`div${leftNum + 1}`);
                 if (finalDiv.style.backgroundColor == leftDiv.style.backgroundColor) {
                     finalDiv = leftDiv;
                 }
-                console.log(finalDiv);
             } else {
                 leftNum = -1;
             }
         }
+        let letterReg = /[^0-9]/g
+        let finId = finalDiv.id
+                    .replace(letterReg, ''); //get the current div's id to use in next function.
+        checkRightAndUp(finId);
+       
     }
 
-    let checkUp = (upNum) => {              //Checks colors of divs above and moves up until there isn't one of the same color.
+    let checkAll = (upNum) => {              //Checks colors of divs above and moves up until there isn't one of the same color.
                                             //The number of divs in each row, so 
         upNum -= rowAndColumnNum;           //we move backwards that many places
-        while (upNum > 0) {                 //Until we've selected to next one up.
-            let nextUp = document.getElementById(`div${upNum}`);
+        while (upNum > 0) { 
+            let nextUp = document.getElementById(`div${upNum}`);                //Until we've selected to next one up.
             if (nextUp.style.backgroundColor == div.style.backgroundColor && upNum >= rowAndColumnNum) { //Checks upNum (div id) to make sure
                 upNum -= rowAndColumnNum;                                                         //it exists. Negative id doesn't exist.
-                nextUp = document.getElementById(`div${upNum}`);
+                let nextUp = document.getElementById(`div${upNum}`);
                 let currentSelect = document.getElementById(`div${upNum + rowAndColumnNum}`); //Stops on the 'inside' of a user created outline. 
                 if (currentSelect.style.backgroundColor == nextUp.style.backgroundColor) { //That's why it's a step backwards.
                     currentSelect = nextUp;
                 }
-                    console.log(currentSelect);
                     let divId = currentSelect.id;
                     divId = divId.replace(letterReg, '');
-                    checkLeft(divId);
+                    leftToLeft = document.getElementById(`div${divId - 1}`);
+                    if (currentSelect.style.backgroundColor == leftToLeft.style.backgroundColor && leftToLeft) {
+                        checkLeft(divId);
+                    } else {
+                        console.log(currentSelect);
+                    }
+                    
             } else {
                 upNum = -1; //Stops the loop.
             }
         }
     }
                     // Put this is down and right funcs >> div.style.cssText = `background-color: ${fillColor}; border: .1px solid #ededed; display: none;`
-   checkUp(divNum);
+   checkAll(divNum);
 
 }
 
@@ -393,6 +443,5 @@ slider.addEventListener('input', changeCanvasSize = () => {
         lilDiv.onclick = 'e.stopPropagation();'
         canvas.appendChild(lilDiv);
     }
-    console.log(canvas.style.gridTemplateRows);
 
 });
