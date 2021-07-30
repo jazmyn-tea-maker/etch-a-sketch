@@ -109,8 +109,6 @@ let clickHoldFunc = () => {
     limited(function() {
         prevDate = window.performance.now();
         let difference = window.performance.now() - prevDate;
-        console.log(difference);
-        console.log(prevDate);
         if (difference < 30) console.log('canvas wait');
         if (colorMode === 'default') {
             document.getElementById('style').innerHTML = '';
@@ -174,34 +172,34 @@ eraserTool.addEventListener('click', function() {
 });
 
 let fillProperties = (e) => {
-    let divColor = e.target.style['background-color'];
+
+    let div = e.target;
     let divNum = e.target.id;
     let letterReg = /[^0-9]/g
     divNum = parseInt(divNum.replace(letterReg, ''));
     let fillColor = document.getElementById('color-selector').value
-    for (i = 0; i < canvas.childElementCount; i++) {
-        let checkLeft = () => {
-            let leftDiv = document.getElementById(`div${divNum - 1}`);
-        }
-        let checkUp = () => {
-            if (true) {
-                let upRow = divNum - rowAndColumnNum;
-                if (upRow >= 0) {
-                    let nextUp = document.getElementById(`div${upRow}`);
-                    if (nextUp.style['background-color'] == divColor) {
-                        divColor = fillColor;
-                        console.log(e.target);
-                        checkUp();
-                    } else {
-                        checkLeft();
-                    }
+
+    let checkUp = (upNum) => { //Checks colors of divs above and moves up until there isn't one of the same color.
+        let upRow = upNum - rowAndColumnNum; //The number of divs in each row, so 
+        upNum = upRow;                      //we move backwards that many places
+        while (upNum > 0) {                 //Until we've selected to next one up.
+            let nextUp = document.getElementById(`div${upNum}`);
+            if (nextUp.style.backgroundColor == div.style.backgroundColor && upNum >= rowAndColumnNum) { //Checks upNum (div id) to make sure
+                upNum = upNum - rowAndColumnNum;                                                         //it exists. Negative id doesn't exist.
+                nextUp = document.getElementById(`div${upNum}`);
+                let currentSelect = document.getElementById(`div${upNum + rowAndColumnNum}`); //Stops on the inside of a 'div'. 
+                if (currentSelect.style.backgroundColor == nextUp.style.backgroundColor) { //Used to stop on the 'outline'. Take it out and see.
+                    currentSelect = nextUp;
                 }
-                
+                console.log(currentSelect);
+            } else {
+                console.log(div);
+                upNum = -1; //Stops the loop.
             }
-        }
-        checkUp();
-        
+        } 
     }
+                    // Put this is down and right funcs >> div.style.cssText = `background-color: ${fillColor}; border: .1px solid #ededed; display: none;`
+    checkUp(divNum);
 }
 
 let fillFunc = () => {
