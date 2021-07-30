@@ -170,8 +170,17 @@ let eraserTool = document.getElementById('eraser');
 eraserTool.addEventListener('click', function() {
     colorMode = 'eraser';
 });
+let test = () => {
+
+}
 
 let fillProperties = (e) => {
+    //Have to get how many elements are in one row.
+    //It's stuck in a string, as you can tell.
+    let rowAndColumnNum = canvas.style.gridTemplateRows;
+    rowAndColumnNum = rowAndColumnNum.split(/[,\(]/g);
+    rowAndColumnNum = parseInt(rowAndColumnNum[1]);
+    console.log(rowAndColumnNum);
 
     let div = e.target;
     let divNum = e.target.id;
@@ -181,20 +190,20 @@ let fillProperties = (e) => {
 
     let checkLeft = (leftNum) => {
         leftNum -= 1;
+        let leftDiv = document.getElementById(`div${leftNum}`);
         while (leftNum > 0) {
-            let leftDiv = document.getElementById(`div${leftNum}`);
             if (leftDiv.style.backgroundColor == div.style.backgroundColor && (leftNum - 1) >= 0) { //Checks upNum (div id) to make sure
-                leftNum--;                                                    //it exists. Negative id doesn't exist.
+                leftNum--;                                                                         //it exists. Negative id doesn't exist.
                 leftDiv = document.getElementById(`div${leftNum}`);
-                let divBefore = document.getElementById(`div${leftNum + 1}`);
-                if (!(divBefore.style.backgroundColor == leftDiv.style.backgroundColor)) {
-                    leftDiv = divBefore;
+                let finalDiv = document.getElementById(`div${leftNum + 1}`);
+                if (finalDiv.style.backgroundColor == leftDiv.style.backgroundColor) {
+                    finalDiv = leftDiv;
                 }
-                console.log(leftDiv);
+                console.log(finalDiv);
             } else {
                 leftNum = -1;
             }
-        } 
+        }
     }
 
     let checkUp = (upNum) => {              //Checks colors of divs above and moves up until there isn't one of the same color.
@@ -205,20 +214,21 @@ let fillProperties = (e) => {
             if (nextUp.style.backgroundColor == div.style.backgroundColor && upNum >= rowAndColumnNum) { //Checks upNum (div id) to make sure
                 upNum -= rowAndColumnNum;                                                         //it exists. Negative id doesn't exist.
                 nextUp = document.getElementById(`div${upNum}`);
-                let currentSelect = document.getElementById(`div${upNum + rowAndColumnNum}`); //Stops on the inside of a 'div'. 
-                if (currentSelect.style.backgroundColor == nextUp.style.backgroundColor) { //Used to stop on the 'outline'. Take it out and see.
+                let currentSelect = document.getElementById(`div${upNum + rowAndColumnNum}`); //Stops on the 'inside' of a user created outline. 
+                if (currentSelect.style.backgroundColor == nextUp.style.backgroundColor) { //That's why it's a step backwards.
                     currentSelect = nextUp;
                 }
-                console.log(currentSelect);
+                    console.log(currentSelect);
+                    let divId = currentSelect.id;
+                    divId = divId.replace(letterReg, '');
+                    checkLeft(divId);
             } else {
-                console.log(div);
                 upNum = -1; //Stops the loop.
             }
-        } 
+        }
     }
                     // Put this is down and right funcs >> div.style.cssText = `background-color: ${fillColor}; border: .1px solid #ededed; display: none;`
-   // checkUp(divNum);
-   checkLeft(divNum);
+   checkUp(divNum);
 
 }
 
@@ -368,8 +378,10 @@ slider.addEventListener('input', changeCanvasSize = () => {
 
     sliderNum = document.getElementById('boxRange').value;
     rowAndColumnNum = sliderNum;
-    canvas.style.gridTemplateRows = `repeat(${rowAndColumnNum}, 1fr)`;
-    canvas.style.gridTemplateColumns = `repeat(${rowAndColumnNum}, 1fr)`;
+    canvas.style.gridTemplateRows = `repeat(
+        ${rowAndColumnNum}
+        , 1fr)`;
+    canvas.style.gridTemplateColumns = `repeat(  ${rowAndColumnNum}  , 1fr)`;
     canvas.innerHTML = '';
     for (i = 0; i < sliderNum ** 2; i++) {
         let lilDiv = document.createElement('div');
@@ -381,5 +393,6 @@ slider.addEventListener('input', changeCanvasSize = () => {
         lilDiv.onclick = 'e.stopPropagation();'
         canvas.appendChild(lilDiv);
     }
+    console.log(canvas.style.gridTemplateRows);
 
 });
