@@ -170,9 +170,6 @@ let eraserTool = document.getElementById('eraser');
 eraserTool.addEventListener('click', function() {
     colorMode = 'eraser';
 });
-let test = () => {
-
-}
 
 let fillProperties = (e) => {
     //Have to get how many elements are in one row.
@@ -188,6 +185,20 @@ let fillProperties = (e) => {
     let fillColor = document.getElementById('color-selector').value
     //Function order: Check up, check left, check right, 
 
+    let checkRightAndDown = (num) => {
+        let nextDownDiv = document.getElementById(`div${num + rowAndColumnNum}`);
+        let rightDiv = document.getElementById(`div${num + 1}`);
+            if (nextDownDiv.style.backgroundColor == selectedDiv.style.backgroundColor 
+                && !(rightDiv.style.backgroundColor == selectedDiv.style.backgroundColor)) {
+                    selectedDiv.style.backgroundColor = fillColor;
+                checkDown(num);
+                } else if (rightDiv.style.backgroundColor == selectedDiv.style.backgroundColor
+                            && !(nextDownDiv.style.backgroundColor == selectedDiv.style.backgroundColor)){
+                    selectedDiv.style.backgroundColor = fillColor;
+                    checkLeft(num);
+            }
+    }
+    
     let checkDown = (num) => {
         let nextDownNum = num + rowAndColumnNum;
         let nextDivDown = document.getElementById(`div${nextDownNum}`);
@@ -198,11 +209,12 @@ let fillProperties = (e) => {
         } else {
             nextDownNum--;
             nextDivDown = document.getElementById(`div${nextDownNum}`);
-            if (nextDivDown.style.backgroundColor == lastDivOnRight.style.backgroundColor) {
+                if (nextDivDown.style.backgroundColor == lastDivOnRight.style.backgroundColor) {
                 lastDivOnRight.style.backgroundColor = fillColor;
                 checkLeft(nextDownNum - 1);
             }
         }
+        checkRightAndDown(nextDownNum);
     }
     
     let checkRight = (num) => {
@@ -221,11 +233,11 @@ let fillProperties = (e) => {
                 }
                 rightId++;
             }
+        checkRightAndDown(nextDownNum);
     }
 
     let checkLeft = (leftNum) => {
         let finalDiv = document.getElementById(`div${leftNum + 1}`);
-        console.log(finalDiv);
         let leftDiv = document.getElementById(`div${leftNum}`);
         while (leftNum > 0) {
             if (leftDiv.style.backgroundColor == div.style.backgroundColor && (leftNum - 1) >= 0) { //Checks upNum (div id) to make sure
