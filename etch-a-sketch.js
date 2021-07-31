@@ -188,41 +188,44 @@ let fillProperties = (e) => {
     let fillColor = document.getElementById('color-selector').value
     //Function order: Check up, check left, check right, 
 
-    let checkRightAndUp = (num) => {
+    let checkDown = (num) => {
+        let nextDownNum = num + rowAndColumnNum;
+        let nextDivDown = document.getElementById(`div${nextDownNum}`);
+        let lastDivOnRight = document.getElementById(`div${num}`);
+        if (nextDivDown.style.backgroundColor == lastDivOnRight.style.backgroundColor) {
+            lastDivOnRight.style.backgroundColor = fillColor;
+            checkLeft(nextDownNum);
+        } else {
+            nextDownNum--;
+            nextDivDown = document.getElementById(`div${nextDownNum}`);
+            if (nextDivDown.style.backgroundColor == lastDivOnRight.style.backgroundColor) {
+                lastDivOnRight.style.backgroundColor = fillColor;
+                checkLeft(nextDownNum - 1);
+            }
+        }
+    }
+    
+    let checkRight = (num) => {
         let rightId = num;
         let selectedDiv = document.getElementById(`div${rightId}`);
         let rightDiv = document.getElementById(`div${rightId + 1}`);
-            while (rightId <= canvas.childElementCount) {
+            while (rightId < canvas.childElementCount) {
                 rightDiv = document.getElementById(`div${rightId + 1}`);
                 if (!rightDiv) {
                     selectedDiv.style.backgroundColor = fillColor;
                 } else if (rightDiv.style.backgroundColor == selectedDiv.style.backgroundColor) {
                     selectedDiv.style.backgroundColor = fillColor;
                     selectedDiv = rightDiv;
+                } else {
+                    checkDown(rightId);
                 }
                 rightId++;
             }
-        // let upFunc = () => {
-        //     if (selectedDiv.style.backgroundColor == upDiv.style.backgroundColor) {
-        //         while (upRowNum > 0) {
-        //             upRowNum -= rowAndColumnNum;                                             
-        //             if (selectedDiv.style.backgroundColor == upDiv.style.backgroundColor) { 
-        //                 selectedDiv = upDiv;
-        //             } else {
-        //                 rightFunc();
-        //             }
-        //             if (!(selectedDiv.style.backgroundColor == upDiv.style.backgroundColor) && !(rightDiv.style.backgroundColor == selectedDiv.style.backgroundColor)) {
-        //                 return;
-        //             }
-        //         }
-        //     }
-        // }
-        // upFunc();
     }
 
     let checkLeft = (leftNum) => {
         let finalDiv = document.getElementById(`div${leftNum + 1}`);
-        leftNum -= 1;
+        console.log(finalDiv);
         let leftDiv = document.getElementById(`div${leftNum}`);
         while (leftNum > 0) {
             if (leftDiv.style.backgroundColor == div.style.backgroundColor && (leftNum - 1) >= 0) { //Checks upNum (div id) to make sure
@@ -234,49 +237,43 @@ let fillProperties = (e) => {
                 }
             } else {
                 leftNum = -1;
+                let finId = finalDiv.id
+                    .replace(letterReg, ''); //get the current div's id to use in next function.
+                checkRight(parseInt(finId));
             }
         }
-        let finId = finalDiv.id
-                    .replace(letterReg, ''); //get the current div's id to use in next function.
-        checkRightAndUp(parseInt(finId));
+        
        
     }
 
     let checkAll = (upNum) => {              //Checks colors of divs above and moves up until there isn't one of the same color.
                                             //The number of divs in each row, so 
         upNum -= rowAndColumnNum;           //we move backwards that many places
-        while (upNum >= 0) { 
-            let nextUp = document.getElementById(`div${upNum}`);                //Until we've selected to next one up.
-            if (nextUp.style.backgroundColor == div.style.backgroundColor && upNum >= 0) { //Checks upNum (div id) to make sure
-                upNum -= rowAndColumnNum;                                                         //it exists. Negative id doesn't exist.
-                let nextUp = document.getElementById(`div${upNum}`);
-                let currentSelect = document.getElementById(`div${upNum + rowAndColumnNum}`); //Stops on the 'inside' of a user created outline. 
-                if (!nextUp || !currentSelect) {
-                    nextUp = document.getElementById(`div1`);
-                } else if (currentSelect.style.backgroundColor == nextUp.style.backgroundColor) { //That's why it's a step backwards.
-                    currentSelect = nextUp;
-                }
+        while (upNum > 0) { 
+            let nextUp = document.getElementById(`div${upNum}`);                          //Until we've selected to next one up.
+            if (nextUp.style.backgroundColor == div.style.backgroundColor && upNum > 0) { //Checks upNum (div id) to make sure
+                if (upNum < rowAndColumnNum) {                                            //it exists. Negative id doesn't exist.
+                    upNum = rowAndColumnNum;
+                    let currentSelect = document.getElementById(`div${upNum}`);
                     let divId = currentSelect.id
                                 .replace(letterReg, '');
-                    let leftToLeft = document.getElementById(`div${divId - 1}`);
-                    if (!leftToLeft) {
-                        checkRightAndUp(divId);
-                    } else if (currentSelect.style.backgroundColor == leftToLeft.style.backgroundColor && leftToLeft) {
-                        checkLeft(divId);
-                    } else {
-                        checkRightAndUp(divId);
-                    }
-                    
+                    checkLeft(parseInt(divId));
+                }
+                upNum -= rowAndColumnNum;                                         
+                let nextUp = document.getElementById(`div${upNum}`);
+                let currentSelect = document.getElementById(`div${upNum + rowAndColumnNum}`); //Stops on the 'inside' of a user created outline. 
+                if (currentSelect.style.backgroundColor == nextUp.style.backgroundColor) { //That's why it's a step backwards.
+                    currentSelect = nextUp;
+                } else {
+                    checkLeft((upNum + rowAndColumnNum));
+                    upNum = -1; //Stops the loop.
+                }
             } else {
+                let divId = currentSelect.id
+                            .replace(letterReg, '');
+                checkLeft(parseInt(divId));
                 upNum = -1; //Stops the loop.
             }
-        }
-        if (upNum < rowAndColumnNum) {
-            upNum = rowAndColumnNum;
-            let currentSelect = document.getElementById(`div${upNum}`);
-            let divId = currentSelect.id
-                        .replace(letterReg, '');
-            checkLeft(parseInt(divId));
         }
     }
                     // Put this is down and right funcs >> div.style.cssText = `background-color: ${fillColor}; border: .1px solid #ededed; display: none;`
@@ -292,21 +289,6 @@ let fillBucketTool = document.getElementById('fill-bucket');
 fillBucketTool.addEventListener('click', function () {
     colorMode = 'fill';
 })
-
-//Next task: Fill bucket.
-//How: Starting with the div selected, check the next
-//one's color. If it's the same, make that one the same color
-//as the last. (The color selected.)
-
-//First instinct is to go up from the selection point.
-//It'll go until the next div is not the same color. (NO color changing at this point.)
-//Then it'll check left AND up until there is a div that's NOT the same color.
-//Now it'll go right and change the last div's color whilst moving right.
-//until finding a div not of the same color. Then it'll check down.
-//If down is the same color, then it'll move left until it hits one that's not the same color. 
-//Only when moving right or down will the last div's color be changed.
-//Continue until there is a div not of the same color as the one up, left, right, or down.
-//At that point, change that div to the color selected and end the function.
 
 //Second to last task: ink dropper. Selects a div and changes the color selector value to 
 //that div's background color. Simple, easy.
