@@ -116,7 +116,7 @@ let clickHoldFunc = () => {
             for (h = 0; h < canvas.childElementCount; h++) {
                 canvas.children.item(h).addEventListener('click', debounced(50, setDefaultColorMode));
                 canvas.children.item(h).addEventListener('mouseenter', setDefaultColorMode);
-                canvas.children.item(h).addEventListener('mousedown', setDefaultColorMode);
+                canvas.children.item(h).addEventListener('mousemove', setDefaultColorMode);
             }
             canvas.addEventListener('mouseup', throttled(66, removalFunc));
             canvas.addEventListener('mouseleave', throttled(66, removalFunc));
@@ -140,7 +140,7 @@ let setUpEventListenersFunc = (propsFunc) => {
     for (h = 0; h < canvas.childElementCount; h++) {
         canvas.children.item(h).addEventListener('click', debounced(50, propsFunc));
         canvas.children.item(h).addEventListener('mouseenter', propsFunc);
-        canvas.children.item(h).addEventListener('mousedown', propsFunc);
+        canvas.children.item(h).addEventListener('mousemove', propsFunc);
     }
     canvas.addEventListener('mouseup', throttled(66, removalFunc));
     canvas.addEventListener('mouseleave', throttled(66, removalFunc));
@@ -171,19 +171,19 @@ eraserTool.addEventListener('click', function() {
     colorMode = 'eraser';
 });
 
+//So, this fill tool isn't so much a fill tool, but a fill 'splash'.
 let fillProperties = (e) => {
     //Have to get how many elements are in one row.
     //It's stuck in a string, as you can tell.
     let rowAndColumnNum = canvas.style.gridTemplateRows;
     rowAndColumnNum = rowAndColumnNum.split(/[,\(]/g); //Takes out comma and parenthese surrounding the number needed.
     rowAndColumnNum = parseInt(rowAndColumnNum[1]);
-
+    
     let div = e.target;
     let divNum = e.target.id;
     let letterReg = /[^0-9]/g
     divNum = parseInt(divNum.replace(letterReg, '')); //Takes number out of the div's id to be used in loop.
     let fillColor = document.getElementById('color-selector').value
-    //Function order: Check up, check left, check right, 
 
     let checkRightAndDown = (num) => {
         let nextDownDiv = document.getElementById(`div${num + rowAndColumnNum}`);
@@ -196,6 +196,14 @@ let fillProperties = (e) => {
                             && !(nextDownDiv.style.backgroundColor == selectedDiv.style.backgroundColor)){
                     selectedDiv.style.backgroundColor = fillColor;
                     checkLeft(num);
+            }
+    }
+
+    let checkUp = (num) => {
+        let nextUpDiv = document.getElementById(`div${num - rowAndColumnNum}`);
+            if (nextUpDiv.style.backgroundColor == selectedDiv.style.backgroundColor) {
+                    selectedDiv.style.backgroundColor = fillColor;
+                    checkAll(num);
             }
     }
     
@@ -233,7 +241,8 @@ let fillProperties = (e) => {
                 }
                 rightId++;
             }
-        checkRightAndDown(nextDownNum);
+        checkUp(rightId);
+        checkRightAndDown(rightId);
     }
 
     let checkLeft = (leftNum) => {
@@ -254,8 +263,6 @@ let fillProperties = (e) => {
                 checkRight(parseInt(finId));
             }
         }
-        
-       
     }
 
     let checkAll = (upNum) => {              //Checks colors of divs above and moves up until there isn't one of the same color.
@@ -275,23 +282,32 @@ let fillProperties = (e) => {
                 let nextUp = document.getElementById(`div${upNum}`);
                 let currentSelect = document.getElementById(`div${upNum + rowAndColumnNum}`); //Stops on the 'inside' of a user created outline. 
                 if (currentSelect.style.backgroundColor == nextUp.style.backgroundColor) { //That's why it's a step backwards.
+                    currentSelect.style.backgrounColor = fillColor;
                     currentSelect = nextUp;
+                    let divId = currentSelect.id
+                            .replace(letterReg, '');
+                    if (divId == 0) {
+                        checkRight(divId);
+                    }
                 } else {
                     checkLeft((upNum + rowAndColumnNum));
+                    console.log('here!');
                     upNum = -1; //Stops the loop.
                 }
-            } else {
+            } else if (!(nextUp.style.backgroundColor == div.style.backgroundColor ) || !nextUp) {
                 let divId = currentSelect.id
                             .replace(letterReg, '');
                 checkLeft(parseInt(divId));
+                console.log('here!');
                 upNum = -1; //Stops the loop.
             }
         }
     }
-                    // Put this is down and right funcs >> div.style.cssText = `background-color: ${fillColor}; border: .1px solid #ededed; display: none;`
+
    checkAll(divNum);
 
 }
+
 
 let fillFunc = () => {
     setUpEventListenersFunc(fillProperties);
