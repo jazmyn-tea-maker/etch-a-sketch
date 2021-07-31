@@ -186,50 +186,42 @@ let fillProperties = (e) => {
     let letterReg = /[^0-9]/g
     divNum = parseInt(divNum.replace(letterReg, '')); //Takes number out of the div's id to be used in loop.
     let fillColor = document.getElementById('color-selector').value
-    
     //Function order: Check up, check left, check right, 
 
     let checkRightAndUp = (num) => {
         let rightId = num;
-        let upRowNum = num - rowAndColumnNum;
-        let selectedDiv = document.getElementById(`div${num}`);
+        let selectedDiv = document.getElementById(`div${rightId}`);
         let rightDiv = document.getElementById(`div${rightId + 1}`);
-        let upDiv = document.getElementById(`div${upRowNum}`);
-        //First instinct is always to check up first.
-        let rightFunc = () => {
-            while (rightId < divNum) {
-                if (rightDiv.style.backgroundColor == selectedDiv.style.backgroundColor) {
+            while (rightId <= canvas.childElementCount) {
+                rightDiv = document.getElementById(`div${rightId + 1}`);
+                if (!rightDiv) {
+                    selectedDiv.style.backgroundColor = fillColor;
+                } else if (rightDiv.style.backgroundColor == selectedDiv.style.backgroundColor) {
                     selectedDiv.style.backgroundColor = fillColor;
                     selectedDiv = rightDiv;
-                    rightId++;
-                } else {
-                    upFunc();
                 }
-                if (!(selectedDiv.style.backgroundColor == upDiv.style.backgroundColor) && !(rightDiv.style.backgroundColor == selectedDiv.style.backgroundColor)) {
-                    return;
-                }
+                rightId++;
             }
-        }
-        let upFunc = () => {
-            if (selectedDiv.style.backgroundColor == upDiv.style.backgroundColor) {
-                while (upRowNum > 0) {
-                    upRowNum -= rowAndColumnNum;                                             
-                    if (selectedDiv.style.backgroundColor == upDiv.style.backgroundColor) { 
-                        selectedDiv = upDiv;
-                    } else {
-                        rightFunc();
-                    }
-                    if (!(selectedDiv.style.backgroundColor == upDiv.style.backgroundColor) && !(rightDiv.style.backgroundColor == selectedDiv.style.backgroundColor)) {
-                        return;
-                    }
-                }
-            }
-        }
-        upFunc();
+        // let upFunc = () => {
+        //     if (selectedDiv.style.backgroundColor == upDiv.style.backgroundColor) {
+        //         while (upRowNum > 0) {
+        //             upRowNum -= rowAndColumnNum;                                             
+        //             if (selectedDiv.style.backgroundColor == upDiv.style.backgroundColor) { 
+        //                 selectedDiv = upDiv;
+        //             } else {
+        //                 rightFunc();
+        //             }
+        //             if (!(selectedDiv.style.backgroundColor == upDiv.style.backgroundColor) && !(rightDiv.style.backgroundColor == selectedDiv.style.backgroundColor)) {
+        //                 return;
+        //             }
+        //         }
+        //     }
+        // }
+        // upFunc();
     }
 
     let checkLeft = (leftNum) => {
-        let finalDiv;
+        let finalDiv = document.getElementById(`div${leftNum + 1}`);
         leftNum -= 1;
         let leftDiv = document.getElementById(`div${leftNum}`);
         while (leftNum > 0) {
@@ -244,37 +236,47 @@ let fillProperties = (e) => {
                 leftNum = -1;
             }
         }
-        let letterReg = /[^0-9]/g
         let finId = finalDiv.id
                     .replace(letterReg, ''); //get the current div's id to use in next function.
-        checkRightAndUp(finId);
+        checkRightAndUp(parseInt(finId));
        
     }
 
     let checkAll = (upNum) => {              //Checks colors of divs above and moves up until there isn't one of the same color.
                                             //The number of divs in each row, so 
         upNum -= rowAndColumnNum;           //we move backwards that many places
-        while (upNum > 0) { 
+        while (upNum >= 0) { 
             let nextUp = document.getElementById(`div${upNum}`);                //Until we've selected to next one up.
-            if (nextUp.style.backgroundColor == div.style.backgroundColor && upNum >= rowAndColumnNum) { //Checks upNum (div id) to make sure
+            if (nextUp.style.backgroundColor == div.style.backgroundColor && upNum >= 0) { //Checks upNum (div id) to make sure
                 upNum -= rowAndColumnNum;                                                         //it exists. Negative id doesn't exist.
                 let nextUp = document.getElementById(`div${upNum}`);
                 let currentSelect = document.getElementById(`div${upNum + rowAndColumnNum}`); //Stops on the 'inside' of a user created outline. 
-                if (currentSelect.style.backgroundColor == nextUp.style.backgroundColor) { //That's why it's a step backwards.
+                if (!nextUp || !currentSelect) {
+                    nextUp = document.getElementById(`div1`);
+                } else if (currentSelect.style.backgroundColor == nextUp.style.backgroundColor) { //That's why it's a step backwards.
                     currentSelect = nextUp;
                 }
-                    let divId = currentSelect.id;
-                    divId = divId.replace(letterReg, '');
-                    leftToLeft = document.getElementById(`div${divId - 1}`);
-                    if (currentSelect.style.backgroundColor == leftToLeft.style.backgroundColor && leftToLeft) {
+                    let divId = currentSelect.id
+                                .replace(letterReg, '');
+                    let leftToLeft = document.getElementById(`div${divId - 1}`);
+                    if (!leftToLeft) {
+                        checkRightAndUp(divId);
+                    } else if (currentSelect.style.backgroundColor == leftToLeft.style.backgroundColor && leftToLeft) {
                         checkLeft(divId);
                     } else {
-                        console.log(currentSelect);
+                        checkRightAndUp(divId);
                     }
                     
             } else {
                 upNum = -1; //Stops the loop.
             }
+        }
+        if (upNum < rowAndColumnNum) {
+            upNum = rowAndColumnNum;
+            let currentSelect = document.getElementById(`div${upNum}`);
+            let divId = currentSelect.id
+                        .replace(letterReg, '');
+            checkLeft(parseInt(divId));
         }
     }
                     // Put this is down and right funcs >> div.style.cssText = `background-color: ${fillColor}; border: .1px solid #ededed; display: none;`
