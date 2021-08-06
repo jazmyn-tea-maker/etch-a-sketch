@@ -171,140 +171,47 @@ eraserTool.addEventListener('click', function() {
     colorMode = 'eraser';
 });
 
-//So, this fill tool isn't so much a fill tool, but a fill 'splash'.
 let fillProperties = (e) => {
     //Have to get how many elements are in one row.
-    //It's stuck in a string, as you can tell.
+    //It's stuck in a string.
     let rowAndColumnNum = canvas.style.gridTemplateRows;
     rowAndColumnNum = rowAndColumnNum.split(/[,\(]/g); //Takes out comma and parenthese surrounding the number needed.
     rowAndColumnNum = parseInt(rowAndColumnNum[1]);
     
-    let div = e.target;
     let divNum = e.target.id;
     let letterReg = /[^0-9]/g
     divNum = parseInt(divNum.replace(letterReg, '')); //Takes number out of the div's id to be used in loop.
     let fillColor = document.getElementById('color-selector').value
-
-    let checkRightAndDown = (num) => {
-        let nextDownDiv = document.getElementById(`div${num + rowAndColumnNum}`);
-        let rightDiv = document.getElementById(`div${num + 1}`);
-            if (nextDownDiv.style.backgroundColor == selectedDiv.style.backgroundColor 
-                && !(rightDiv.style.backgroundColor == selectedDiv.style.backgroundColor)) {
-                    selectedDiv.style.backgroundColor = fillColor;
-                checkDown(num);
-                } else if (rightDiv.style.backgroundColor == selectedDiv.style.backgroundColor
-                            && !(nextDownDiv.style.backgroundColor == selectedDiv.style.backgroundColor)){
-                    selectedDiv.style.backgroundColor = fillColor;
-                    checkLeft(num);
+    let divCords = [];
+    let createDivCoordinates = () => {
+        let y = 0;
+        let x = 0;
+        for (i = canvas.childElementCount - 1; i >= 0; i -= rowAndColumnNum) {
+            let divPlace = canvas.children.item(i).id;
+            let letterReg = /[^0-9]/g
+            divPlace = parseInt(divPlace.replace(letterReg, ''));
+            if (i > rowAndColumnNum) {
+                y++; //Counts how many times it has to 'jump' up a row, same as counting the y index.
             }
-    }
-
-    let checkUp = (num) => {
-        let nextUpDiv = document.getElementById(`div${num - rowAndColumnNum}`);
-            if (nextUpDiv.style.backgroundColor == selectedDiv.style.backgroundColor) {
-                    selectedDiv.style.backgroundColor = fillColor;
-                    checkAll(num);
-            }
-    }
-    
-    let checkDown = (num) => {
-        let nextDownNum = num + rowAndColumnNum;
-        let nextDivDown = document.getElementById(`div${nextDownNum}`);
-        let lastDivOnRight = document.getElementById(`div${num}`);
-        if (nextDivDown.style.backgroundColor == lastDivOnRight.style.backgroundColor) {
-            lastDivOnRight.style.backgroundColor = fillColor;
-            checkLeft(nextDownNum);
-        } else {
-            nextDownNum--;
-            nextDivDown = document.getElementById(`div${nextDownNum}`);
-                if (nextDivDown.style.backgroundColor == lastDivOnRight.style.backgroundColor) {
-                lastDivOnRight.style.backgroundColor = fillColor;
-                checkLeft(nextDownNum - 1);
-            }
-        }
-        checkRightAndDown(nextDownNum);
-    }
-    
-    let checkRight = (num) => {
-        let rightId = num;
-        let selectedDiv = document.getElementById(`div${rightId}`);
-        let rightDiv = document.getElementById(`div${rightId + 1}`);
-            while (rightId < canvas.childElementCount) {
-                rightDiv = document.getElementById(`div${rightId + 1}`);
-                if (!rightDiv) {
-                    selectedDiv.style.backgroundColor = fillColor;
-                } else if (rightDiv.style.backgroundColor == selectedDiv.style.backgroundColor) {
-                    selectedDiv.style.backgroundColor = fillColor;
-                    selectedDiv = rightDiv;
-                } else {
-                    checkDown(rightId);
-                }
-                rightId++;
-            }
-        checkUp(rightId);
-        checkRightAndDown(rightId);
-    }
-
-    let checkLeft = (leftNum) => {
-        let finalDiv = document.getElementById(`div${leftNum + 1}`);
-        let leftDiv = document.getElementById(`div${leftNum}`);
-        while (leftNum > 0) {
-            if (leftDiv.style.backgroundColor == div.style.backgroundColor && (leftNum - 1) >= 0) { //Checks upNum (div id) to make sure
-                leftNum--;                                                                         //it exists. Negative id doesn't exist.
-                leftDiv = document.getElementById(`div${leftNum}`);
-                finalDiv = document.getElementById(`div${leftNum + 1}`);
-                if (finalDiv.style.backgroundColor == leftDiv.style.backgroundColor) {
-                    finalDiv = leftDiv;
-                }
-            } else {
-                leftNum = -1;
-                let finId = finalDiv.id
-                    .replace(letterReg, ''); //get the current div's id to use in next function.
-                checkRight(parseInt(finId));
-            }
-        }
-    }
-
-    let checkAll = (upNum) => {              //Checks colors of divs above and moves up until there isn't one of the same color.
-                                            //The number of divs in each row, so 
-        upNum -= rowAndColumnNum;           //we move backwards that many places
-        while (upNum > 0) { 
-            let nextUp = document.getElementById(`div${upNum}`);                          //Until we've selected to next one up.
-            if (nextUp.style.backgroundColor == div.style.backgroundColor && upNum > 0) { //Checks upNum (div id) to make sure
-                if (upNum < rowAndColumnNum) {                                            //it exists. Negative id doesn't exist.
-                    upNum = rowAndColumnNum;
-                    let currentSelect = document.getElementById(`div${upNum}`);
-                    let divId = currentSelect.id
-                                .replace(letterReg, '');
-                    checkLeft(parseInt(divId));
-                }
-                upNum -= rowAndColumnNum;                                         
-                let nextUp = document.getElementById(`div${upNum}`);
-                let currentSelect = document.getElementById(`div${upNum + rowAndColumnNum}`); //Stops on the 'inside' of a user created outline. 
-                if (currentSelect.style.backgroundColor == nextUp.style.backgroundColor) { //That's why it's a step backwards.
-                    currentSelect.style.backgrounColor = fillColor;
-                    currentSelect = nextUp;
-                    let divId = currentSelect.id
-                            .replace(letterReg, '');
-                    if (divId == 0) {
-                        checkRight(divId);
+            if (i < rowAndColumnNum) {
+                while (y >= 0) {
+                    let j = divPlace;
+                    while (j >= 0) {
+                        x = j; //Goes to the largest 'x' value, and then goes backwards to show other possible values.
+                        j--;
+                        divCords.push([x, y]); //Push the index of each into an object, correlating it to the coordinate.
                     }
-                } else {
-                    checkLeft((upNum + rowAndColumnNum));
-                    console.log('here!');
-                    upNum = -1; //Stops the loop.
+                    y--;    
                 }
-            } else if (!(nextUp.style.backgroundColor == div.style.backgroundColor ) || !nextUp) {
-                let divId = currentSelect.id
-                            .replace(letterReg, '');
-                checkLeft(parseInt(divId));
-                console.log('here!');
-                upNum = -1; //Stops the loop.
+                
             }
         }
+        divCords = divCords.reverse(); //Starts at origin. (0,0)
     }
+    createDivCoordinates();
 
-   checkAll(divNum);
+    console.log(divCords);
+    
 
 }
 
