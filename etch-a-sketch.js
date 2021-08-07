@@ -178,12 +178,14 @@ let fillProperties = (e) => {
     rowAndColumnNum = rowAndColumnNum.split(/[,\(]/g); //Takes out comma and parenthese surrounding the number needed.
     rowAndColumnNum = parseInt(rowAndColumnNum[1]);
     
-    let div = e.target;
     let divNum = e.target.id;
+    let div = document.getElementById(divNum);
+    let ogColor = div.style.backgroundColor;
     let letterReg = /[^0-9]/g
     divNum = parseInt(divNum.replace(letterReg, '')); //Takes number out of the div's id to be used in loop.
     let fillColor = document.getElementById('color-selector').value
     let divCords = [];
+
     let createDivCoordinates = () => {
         let y = 0;
         let x = 0;
@@ -206,11 +208,11 @@ let fillProperties = (e) => {
                 }
             }
         }
-        divCords = divCords.reverse(); //Starts at origin. (0,0)
+        divCords = divCords.reverse(); //Starts list at origin. (0,0)
     }
     createDivCoordinates();
 
-    let divObj = {};
+    let divObj = {}; //Connects each coordinate to respective div by a property.
     k = 0;
     while (k < divCords.length) {
         divObj[`div${k}`] = divCords[k]; 
@@ -223,8 +225,8 @@ let fillProperties = (e) => {
     let nextDiv;
 
     let getNextUpId = () => {
-        for (const [divId, cords] of Object.entries(divObj)) {
-            if (nextDivUpCords[0] == cords[0] && nextDivUpCords[1] == cords[1]) {
+        for (const [divId, cords] of Object.entries(divObj)) { //Run through prop values to check if coordinates match
+            if (nextDivUpCords[0] == cords[0] && nextDivUpCords[1] == cords[1]) { //to find correct id.
                 nextId = divId;
             }
             nextDiv = document.getElementById(`${nextId}`);
@@ -233,17 +235,106 @@ let fillProperties = (e) => {
 
     getNextUpId();
 
-    while (nextDivUpCords[1] >= 0) {
+    while (nextDivUpCords[1] - 1 >= 0) {
         if (nextDiv.style.backgroundColor == div.style.backgroundColor) {
             div = nextDiv;
             nextDivUpCords[1] = nextDivUpCords[1] - 1;
             getNextUpId();
-            console.log(div);
         } else {
-            console.log(div);
             break;
         }
     }
+
+    let checkLeft;
+    let leftDiv, leftDivCords;
+    let checkRight;
+    let rightDiv, rightDivCords;
+    let checkDown;
+    let downDiv, downDivCords;
+
+    let checkCordsforPush = (coordinates) => {
+        
+        if (checkLeft) {
+            leftDivCords = [...coordinates];
+            leftDivCords[0] = leftDivCords[0] - 1;
+            for (const [divId, cords] of Object.entries(divObj)) {
+                if (leftDivCords[0] == cords[0] && leftDivCords[1] == cords[1]) {
+                    nextId = divId;
+                }
+                leftDiv = document.getElementById(nextId);
+            }
+        }
+        if (checkRight) {
+            rightDivCords = [...coordinates];
+            rightDivCords[0] = rightDivCords[0] + 1;
+            for (const [divId, cords] of Object.entries(divObj)) {
+                if (rightDivCords[0] == cords[0] && rightDivCords[1] == cords[1]) {
+                    nextId = divId;
+                }
+                rightDiv = document.getElementById(nextId);
+            }
+        }
+
+        if (checkDown) {
+            downDivCords = [...coordinates];
+            downDivCords[1] = downDivCords[1] + 1;
+            while (downDivCords[1] <= rowAndColumnNum) {
+                console.log(downDivCords[1]);
+                for (const [divId, cords] of Object.entries(divObj)) {
+                    if (downDivCords[0] == cords[0] && downDivCords[1] == cords[1]) {
+                        nextId = divId;
+                    }
+                    downDiv = document.getElementById(nextId);
+                }
+                if (downDiv.style.backgroundColor == ogColor) {
+                    nextDiv.style.backgroundColor = fillColor;
+                    nextDiv = downDiv;
+                    downDivCords[1] = downDivCords[1] + 1;
+                }
+            }
+        }
+    }
+
+    let checkStack = [];
+
+    if (!checkLeft) {
+        checkRight = false;
+        checkDown = false;
+        checkLeft = true;
+        checkCordsforPush(nextDivUpCords);
+        if (leftDiv.style.backgroundColor == ogColor) {
+            checkStack.push(leftDivCords);
+        }
+    }
+    
+
+    if (!checkRight) {
+        checkLeft = false;
+        checkDown = false;
+        checkRight = true;
+        checkCordsforPush(nextDivUpCords);
+        if (rightDiv.style.backgroundColor == ogColor) {
+            checkStack.push(rightDivCords);
+        }
+    }
+
+    if (!checkDown) {
+        checkLeft = false;
+        checkRight = false;
+        checkDown = true;
+        checkCordsforPush(nextDivUpCords);
+    }
+    
+
+
+
+
+    // Next, make a function that goes down, checking left and right and adding those divs to a 'pop' stack array.
+    // Change the div colors to the fill selected on the way back down.
+    // When it reaches the bottom, go to each div in the pop stack and repeat the going down and checking left and right,
+    // adding more to the pop stack. Complete the ones added first.
+    // Always check up first.
+    // If there is nothing on the left, check right. Vice versa.
     
 }
 
