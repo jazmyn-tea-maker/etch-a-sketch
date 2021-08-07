@@ -178,6 +178,7 @@ let fillProperties = (e) => {
     rowAndColumnNum = rowAndColumnNum.split(/[,\(]/g); //Takes out comma and parenthese surrounding the number needed.
     rowAndColumnNum = parseInt(rowAndColumnNum[1]);
     
+    let div = e.target;
     let divNum = e.target.id;
     let letterReg = /[^0-9]/g
     divNum = parseInt(divNum.replace(letterReg, '')); //Takes number out of the div's id to be used in loop.
@@ -199,20 +200,51 @@ let fillProperties = (e) => {
                     while (j >= 0) {
                         x = j; //Goes to the largest 'x' value, and then goes backwards to show other possible values.
                         j--;
-                        divCords.push([x, y]); //Push the index of each into an object, correlating it to the coordinate.
+                        divCords.push([x, y]);
                     }
                     y--;    
                 }
-                
             }
         }
         divCords = divCords.reverse(); //Starts at origin. (0,0)
     }
     createDivCoordinates();
 
-    console.log(divCords);
-    
+    let divObj = {};
+    k = 0;
+    while (k < divCords.length) {
+        divObj[`div${k}`] = divCords[k]; 
+        k++;
+    }
 
+    let startingDivCords = divCords[divNum];
+    let nextDivUpCords = [startingDivCords[0], (startingDivCords[1] - 1)];
+    let nextId;
+    let nextDiv;
+
+    let getNextUpId = () => {
+        for (const [divId, cords] of Object.entries(divObj)) {
+            if (nextDivUpCords[0] == cords[0] && nextDivUpCords[1] == cords[1]) {
+                nextId = divId;
+            }
+            nextDiv = document.getElementById(`${nextId}`);
+        }   
+    };
+
+    getNextUpId();
+
+    while (nextDivUpCords[1] >= 0) {
+        if (nextDiv.style.backgroundColor == div.style.backgroundColor) {
+            div = nextDiv;
+            nextDivUpCords[1] = nextDivUpCords[1] - 1;
+            getNextUpId();
+            console.log(div);
+        } else {
+            console.log(div);
+            break;
+        }
+    }
+    
 }
 
 
