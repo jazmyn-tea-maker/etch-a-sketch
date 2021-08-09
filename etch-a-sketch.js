@@ -367,7 +367,10 @@ let colorInProperties = (e) => { //Was a fill tool. Now it is a 'coloring in' he
     
 }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> dadd65a (Fill bucket is now a coloring tool instead. Just colors two or three columns at a time.)
 let colorInFunc = () => {
     setUpEventListenersFunc(colorInProperties);
 }
@@ -377,9 +380,6 @@ colorInTool.addEventListener('click', function () {
     colorMode = 'coloring';
     console.log(`Color mode is now ${colorMode}`);
 })
-
-//Second to last task: ink dropper. Selects a div and changes the color selector value to 
-//that div's background color. Simple, easy.
 
 //Last task: media query for mobile.
 
