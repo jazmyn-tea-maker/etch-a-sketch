@@ -367,10 +367,7 @@ let colorInProperties = (e) => { //Was a fill tool. Now it is a 'coloring in' he
     
 }
 
-<<<<<<< HEAD
 
-=======
->>>>>>> dadd65a (Fill bucket is now a coloring tool instead. Just colors two or three columns at a time.)
 let colorInFunc = () => {
     setUpEventListenersFunc(colorInProperties);
 }
