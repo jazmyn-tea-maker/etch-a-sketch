@@ -257,21 +257,42 @@ let fillProperties = (e) => {
         if (checkLeft) {
             leftDivCords = [...coordinates];
             leftDivCords[0] = leftDivCords[0] - 1;
+            if (nextDiv.style.backgroundColor != ogColor) {
+                leftDivCords[1] = leftDivCords[1] + 1;
+            }
             for (const [divId, cords] of Object.entries(divObj)) {
                 if (leftDivCords[0] == cords[0] && leftDivCords[1] == cords[1]) {
                     nextId = divId;
+                    if (leftDivCords[0] >= 0 && leftDivCords[1] >= 0) {
+                        leftDiv = document.getElementById(nextId);
+                        console.log(leftDiv);
+                        if (leftDiv.style.backgroundColor == ogColor) {
+                            checkStack.push(leftDivCords);
+                        }
+                    } else {
+                        break;
+                    }
                 }
-                leftDiv = document.getElementById(nextId);
             }
         }
         if (checkRight) {
             rightDivCords = [...coordinates];
             rightDivCords[0] = rightDivCords[0] + 1;
+            if (nextDiv.style.backgroundColor != ogColor) {
+                rightDivCords[1] = rightDivCords[1] + 1;
+            }
             for (const [divId, cords] of Object.entries(divObj)) {
                 if (rightDivCords[0] == cords[0] && rightDivCords[1] == cords[1]) {
                     nextId = divId;
+                    if (rightDivCords[0] >= 0 && rightDivCords[1] >= 0) {
+                        rightDiv = document.getElementById(nextId);
+                        if (rightDiv.style.backgroundColor == ogColor) {
+                            checkStack.push(rightDivCords);
+                        }
+                    } else {
+                        break;
+                    }
                 }
-                rightDiv = document.getElementById(nextId);
             }
         }
 
@@ -286,10 +307,12 @@ let fillProperties = (e) => {
                     downDiv = document.getElementById(nextId);
                 }
                 if (downDiv.style.backgroundColor == ogColor) {
+                    if (downDiv.style.backgroundColor == nextDiv.style.backgroundColor) {
+                        nextDiv.style.backgroundColor = fillColor;
+                    }
                     downDiv.style.backgroundColor = fillColor;
                     nextDiv = downDiv;
                     downDivCords[1] = downDivCords[1] + 1;
-                    console.log(downDiv);
                 } else {
                     break;
                 }
@@ -304,9 +327,6 @@ let fillProperties = (e) => {
         checkDown = false;
         checkLeft = true;
         checkCordsforPush(nextDivUpCords);
-        if (leftDiv.style.backgroundColor == ogColor) {
-            checkStack.push(leftDivCords);
-        }
     }
     
 
@@ -315,9 +335,6 @@ let fillProperties = (e) => {
         checkDown = false;
         checkRight = true;
         checkCordsforPush(nextDivUpCords);
-        if (rightDiv.style.backgroundColor == ogColor) {
-            checkStack.push(rightDivCords);
-        }
     }
 
     if (!checkDown) {
@@ -326,10 +343,9 @@ let fillProperties = (e) => {
         checkDown = true;
         checkCordsforPush(nextDivUpCords);
     }
+
+    console.log(checkStack);
     
-
-
-
 
     // Next, make a function that goes down, checking left and right and adding those divs to a 'pop' stack array.
     // Change the div colors to the fill selected on the way back down.
