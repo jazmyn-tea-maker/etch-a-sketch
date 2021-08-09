@@ -279,7 +279,6 @@ let fillProperties = (e) => {
             downDivCords = [...coordinates];
             downDivCords[1] = downDivCords[1] + 1;
             while (downDivCords[1] <= rowAndColumnNum) {
-                console.log(downDivCords[1]);
                 for (const [divId, cords] of Object.entries(divObj)) {
                     if (downDivCords[0] == cords[0] && downDivCords[1] == cords[1]) {
                         nextId = divId;
@@ -287,9 +286,12 @@ let fillProperties = (e) => {
                     downDiv = document.getElementById(nextId);
                 }
                 if (downDiv.style.backgroundColor == ogColor) {
-                    nextDiv.style.backgroundColor = fillColor;
+                    downDiv.style.backgroundColor = fillColor;
                     nextDiv = downDiv;
                     downDivCords[1] = downDivCords[1] + 1;
+                    console.log(downDiv);
+                } else {
+                    break;
                 }
             }
         }
