@@ -76,7 +76,7 @@ function factory() { // Function call limiter. Only applied to event listener re
     }
 };
 
-let colorMode = 'default'; // Used to set how the div changes color.
+let colorMode = 'default/pencil'; // Used to set how the div changes color.
 
 let removalFunc = () => {
    setTimeout(function () {
@@ -110,7 +110,7 @@ let clickHoldFunc = () => {
         prevDate = window.performance.now();
         let difference = window.performance.now() - prevDate;
         if (difference < 30) console.log('canvas wait');
-        if (colorMode === 'default') {
+        if (colorMode === 'default/pencil') {
             document.getElementById('style').innerHTML = '';
             console.log(`Color mode is now ${colorMode}.`);
             for (h = 0; h < canvas.childElementCount; h++) {
@@ -130,8 +130,8 @@ let clickHoldFunc = () => {
         if (colorMode === 'eraser') {
             eraseFunc();
         }
-        if (colorMode === 'fill'){
-            fillFunc();
+        if (colorMode === 'coloring'){
+            colorInFunc();
         }
     })
 }
@@ -149,12 +149,9 @@ let setUpEventListenersFunc = (propsFunc) => {
 //Event Functions.
 canvas.addEventListener('mousedown', clickHoldFunc);
 
-
-
-
 let pencilTool = document.getElementById('pencil');
 pencilTool.addEventListener('click', function backToDefault () {
-    colorMode = 'default';
+    colorMode = 'default/pencil';
     console.log(`Color mode is now ${colorMode}.`);
 });
 
@@ -169,9 +166,11 @@ let eraseFunc = () => {
 let eraserTool = document.getElementById('eraser');
 eraserTool.addEventListener('click', function() {
     colorMode = 'eraser';
+    console.log(`Color mode is now ${colorMode}.`);
 });
 
-let fillProperties = (e) => {
+let colorInProperties = (e) => { //Was a fill tool. Now it is a 'coloring in' helper. In short, I gave up.
+
     //Have to get how many elements are in one row.
     //It's stuck in a string.
     let rowAndColumnNum = canvas.style.gridTemplateRows;
@@ -186,7 +185,7 @@ let fillProperties = (e) => {
     let fillColor = document.getElementById('color-selector').value
     let divCords = [];
 
-    let createDivCoordinates = () => {
+    let createDivCoordinates = () => { //Based off pixels on a canvas.
         let y = 0;
         let x = 0;
         for (i = canvas.childElementCount - 1; i >= 0; i -= rowAndColumnNum) {
@@ -224,90 +223,70 @@ let fillProperties = (e) => {
     let nextId;
     let nextDiv;
 
+    if (nextDivUpCords[1] < 0) {
+        nextDivUpCords[1] = 0;
+    }
+
+    if (nextDivUpCords[0] < 0) {
+        nextDivUpCords[0] = 0;
+    }
+
     let getNextUpId = () => {
-        for (const [divId, cords] of Object.entries(divObj)) { //Run through prop values to check if coordinates match
-            if (nextDivUpCords[0] == cords[0] && nextDivUpCords[1] == cords[1]) { //to find correct id.
-                nextId = divId;
+        
+        let findDivId = () => {
+            for (const [divId, cords] of Object.entries(divObj)) { //Run through prop values to check if coordinates match
+                if (nextDivUpCords[0] == cords[0] && nextDivUpCords[1] == cords[1]) { //to find correct id.
+                    
+                    nextId = divId;
+                }
+                nextDiv = document.getElementById(`${nextId}`);
             }
-            nextDiv = document.getElementById(`${nextId}`);
-        }   
+        }
+
+        while (nextDivUpCords[1] - 1 >= 0 || nextDivUpCords[1] == 0) { //Goes up until it gets to the highest possible same color div within the column.
+            findDivId();
+            if (nextDiv.style.backgroundColor == ogColor) {
+
+                nextDivUpCords[1] = nextDivUpCords[1] - 1;
+                findDivId();
+            } else {
+                break;
+            }
+        } 
     };
 
     getNextUpId();
 
-    while (nextDivUpCords[1] - 1 >= 0) {
-        if (nextDiv.style.backgroundColor == div.style.backgroundColor) {
-            div = nextDiv;
-            nextDivUpCords[1] = nextDivUpCords[1] - 1;
-            getNextUpId();
-        } else {
-            break;
-        }
-    }
+        
 
-    let checkLeft;
+    let checkLeft = true;
     let leftDiv, leftDivCords;
-    let checkRight;
+    let checkRight = true;
     let rightDiv, rightDivCords;
-    let checkDown;
     let downDiv, downDivCords;
 
     let checkCordsforPush = (coordinates) => {
-        
-        if (checkLeft) {
-            leftDivCords = [...coordinates];
-            leftDivCords[0] = leftDivCords[0] - 1;
-            if (nextDiv.style.backgroundColor != ogColor) {
-                leftDivCords[1] = leftDivCords[1] + 1;
-            }
-            for (const [divId, cords] of Object.entries(divObj)) {
-                if (leftDivCords[0] == cords[0] && leftDivCords[1] == cords[1]) {
-                    nextId = divId;
-                    if (leftDivCords[0] >= 0 && leftDivCords[1] >= 0) {
-                        leftDiv = document.getElementById(nextId);
-                        console.log(leftDiv);
-                        if (leftDiv.style.backgroundColor == ogColor) {
-                            checkStack.push(leftDivCords);
-                        }
-                    } else {
-                        break;
-                    }
-                }
-            }
-        }
-        if (checkRight) {
-            rightDivCords = [...coordinates];
-            rightDivCords[0] = rightDivCords[0] + 1;
-            if (nextDiv.style.backgroundColor != ogColor) {
-                rightDivCords[1] = rightDivCords[1] + 1;
-            }
-            for (const [divId, cords] of Object.entries(divObj)) {
-                if (rightDivCords[0] == cords[0] && rightDivCords[1] == cords[1]) {
-                    nextId = divId;
-                    if (rightDivCords[0] >= 0 && rightDivCords[1] >= 0) {
-                        rightDiv = document.getElementById(nextId);
-                        if (rightDiv.style.backgroundColor == ogColor) {
-                            checkStack.push(rightDivCords);
-                        }
-                    } else {
-                        break;
-                    }
-                }
-            }
-        }
 
-        if (checkDown) {
-            downDivCords = [...coordinates];
+        let checkDown = (downCords) => {
+
+            nextDivUpCords = [...downCords];
+            getNextUpId();
+            downDivCords = nextDivUpCords;
             downDivCords[1] = downDivCords[1] + 1;
             while (downDivCords[1] <= rowAndColumnNum) {
+
                 for (const [divId, cords] of Object.entries(divObj)) {
+
                     if (downDivCords[0] == cords[0] && downDivCords[1] == cords[1]) {
                         nextId = divId;
-                    }
+                    } //Loops through the coordinates to match it to the right id.
+
                     downDiv = document.getElementById(nextId);
                 }
                 if (downDiv.style.backgroundColor == ogColor) {
+
                     if (downDiv.style.backgroundColor == nextDiv.style.backgroundColor) {
+
                         nextDiv.style.backgroundColor = fillColor;
                     }
                     downDiv.style.backgroundColor = fillColor;
@@ -318,52 +297,85 @@ let fillProperties = (e) => {
                 }
             }
         }
+
+        checkDown(coordinates);
+        
+        if (checkLeft) {
+
+            nextDivUpCords = [...coordinates];
+            getNextUpId();
+            leftDivCords = nextDivUpCords;
+            leftDivCords[0] = leftDivCords[0] - 1;
+            if (nextDiv.style.backgroundColor != ogColor) {
+                leftDivCords[1] = leftDivCords[1] + 1;
+            }
+            for (const [divId, cords] of Object.entries(divObj)) {
+
+                if (leftDivCords[0] == cords[0] && leftDivCords[1] == cords[1]) {
+
+                    nextId = divId; //Loops through the coordinates to match it to the right id.
+                    if (leftDivCords[0] >= 0 && leftDivCords[1] >= 0) {
+
+                        leftDiv = document.getElementById(nextId);
+                        if (leftDiv.style.backgroundColor == ogColor) {
+                            checkDown(leftDivCords);
+                        } else {
+                            break;
+                        }
+                    } else {
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (checkRight) {
+
+            nextDivUpCords = [...coordinates];
+            getNextUpId();
+            nextDiv = document.getElementById(nextId);
+            rightDivCords = [...coordinates];
+            rightDivCords[0] = rightDivCords[0] + 1;
+            if (nextDiv.style.backgroundColor != ogColor) {
+                rightDivCords[1] = rightDivCords[1] + 1;
+            }
+            for (const [divId, cords] of Object.entries(divObj)) {
+
+                if (rightDivCords[0] == cords[0] && rightDivCords[1] == cords[1]) {
+
+                    nextId = divId; //Loops through the coordinates to match it to the right id.
+                    if (rightDivCords[0] >= 0 && rightDivCords[1] >= 0) {
+
+                        rightDiv = document.getElementById(nextId);
+                        if (rightDiv.style.backgroundColor == ogColor) {
+
+                            checkDown(rightDivCords);
+                        } else {
+                            break;
+                        }
+                    } else {
+                        break;
+                    }
+                }
+            }
+        }
+
+        
     }
 
-    let checkStack = [];
-
-    if (!checkLeft) {
-        checkRight = false;
-        checkDown = false;
-        checkLeft = true;
-        checkCordsforPush(nextDivUpCords);
-    }
-    
-
-    if (!checkRight) {
-        checkLeft = false;
-        checkDown = false;
-        checkRight = true;
-        checkCordsforPush(nextDivUpCords);
-    }
-
-    if (!checkDown) {
-        checkLeft = false;
-        checkRight = false;
-        checkDown = true;
-        checkCordsforPush(nextDivUpCords);
-    }
-
-    console.log(checkStack);
-    
-
-    // Next, make a function that goes down, checking left and right and adding those divs to a 'pop' stack array.
-    // Change the div colors to the fill selected on the way back down.
-    // When it reaches the bottom, go to each div in the pop stack and repeat the going down and checking left and right,
-    // adding more to the pop stack. Complete the ones added first.
-    // Always check up first.
-    // If there is nothing on the left, check right. Vice versa.
+    checkCordsforPush(nextDivUpCords);
     
 }
 
 
-let fillFunc = () => {
-    setUpEventListenersFunc(fillProperties);
+let colorInFunc = () => {
+    setUpEventListenersFunc(colorInProperties);
 }
 
-let fillBucketTool = document.getElementById('fill-bucket');
-fillBucketTool.addEventListener('click', function () {
-    colorMode = 'fill';
+let colorInTool = document.getElementById('color-in-tool');
+colorInTool.addEventListener('click', function () {
+    colorMode = 'coloring';
+    console.log(`Color mode is now ${colorMode}`);
 })
 
 //Second to last task: ink dropper. Selects a div and changes the color selector value to 
