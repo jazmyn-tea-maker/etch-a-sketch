@@ -7,7 +7,9 @@ setDefaultSlider();
 
 let setDivColorDefault = () => {
     let divColor = document.getElementById('color-selector');
-    divColor.value = '000000'; // Default color.
+    divColor.value = '000000'; // Black.
+    let backgroundColor = document.getElementById('bgc-selector');
+    backgroundColor.value = '000000'; // Black.
 }
 
 setDivColorDefault();
@@ -511,4 +513,10 @@ slider.addEventListener('input', changeCanvasSize = () => {
         canvas.appendChild(lilDiv);
     }
 
+});
+
+document.getElementById('bgc-selector').addEventListener('input', function () {
+    let backgroundColor = document.getElementById('bgc-selector').value;
+    let background = document.getElementsByTagName('body').item(0);
+    background.style.backgroundColor = backgroundColor;
 });
