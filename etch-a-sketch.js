@@ -378,8 +378,6 @@ colorInTool.addEventListener('click', function () {
     console.log(`Color mode is now ${colorMode}`);
 })
 
-//Last task: media query for mobile.
-
 let setTrailBrushProperties = (e) => { // Sets an animation for the div interacted with so it looks like a 'trail'.
     let style = document.getElementById('style');
     let keyFrames = '\
@@ -414,8 +412,8 @@ document.getElementById('trail-button').addEventListener('click', function () {
 });
 
 let setRbgBrushProperties = (e) => { // Randomizes a color for the div interacted with.
-    let colorVal = '#' + Math.floor(Math.random()*16777215).toString(16); // Returns random color.
-    e.target.style.backgroundColor = colorVal;
+    let colorVal = Math.floor(Math.random()*16777215).toString(16); // Returns random color.
+    e.target.style.backgroundColor = '#' + colorVal;
 };
 
 let setRbgBrush = () => {
