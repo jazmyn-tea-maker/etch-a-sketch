@@ -440,7 +440,7 @@ let resetCanvasProperties = () => {
         let resetAnim =`
             #${div.id} {
                 animation-name: reset;
-                animation-duration: 1s;
+                animation-duration: .5s;
                 animation-timing function: ease-out;
             }`
         style.innerHTML = style.innerHTML + keyFrames + resetAnim;
@@ -455,7 +455,7 @@ let resetCanvasProperties = () => {
             newDiv.style.backgroundColor = '#FFFFFF';
             div.parentNode.replaceChild(newDiv, div);
         }
-    }, 1000)
+    }, 500)
 }
 
 document.getElementById('reset-button').addEventListener('click', resetCanvasProperties);

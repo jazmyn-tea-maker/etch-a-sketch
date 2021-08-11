@@ -32,7 +32,15 @@ body {
     width: 225px;
     border-radius: 10px;
     margin-top: 10vh;
-    background-color: rgb(166, 186, 194);
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.icons {
+    position: relative;
+    display: block;
+    filter: invert(1);
+    height: inherit;
+    width: inherit;
 }
 
 #canvas {
@@ -71,7 +79,7 @@ body {
     display: block;
     position: relative;
     text-align: center;
-    color: rgb(9, 117, 170);
+    color: rgb(208, 239, 255);
     margin: auto;
     margin-bottom: -10px;
     margin-top: 10px;
@@ -110,11 +118,11 @@ body {
 }
 
 .tool-block {
+    position: relative;
     display: block;
     float: right;
-    height: 40px;
-    width: 40px;
-    background-color: rgb(58, 68, 95);
+    height: 50px;
+    width: 50px;
 }
 
 #tools-flex-div {
@@ -126,6 +134,10 @@ body {
     margin-right: auto;
     width: 200px;
     height: 40px;
+}
+
+#tools-flex-div > div > img:active {
+    filter: invert(.5);
 }
 
 #button-div {
@@ -240,7 +252,6 @@ body {
         margin: auto;
         width: 350px;
         border-radius: 10px;
-        background-color: rgb(166, 186, 194);
     }
     #button-div > button {
         width: 300px;
