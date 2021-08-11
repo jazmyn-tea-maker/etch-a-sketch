@@ -1,6 +1,3 @@
-html {
-    overflow: hidden;
-}
 
 body {
     background-color: black;
@@ -9,7 +6,7 @@ body {
 }
 
 .game-title {
-    color: white;
+    color: rgb(199, 230, 255);
     text-align: center;
     position: relative;
     top: -2vh;
@@ -83,6 +80,11 @@ body {
     margin: auto;
     margin-bottom: -10px;
     margin-top: 10px;
+}
+
+.author-title {
+    margin: auto; 
+    color:#ededed;
 }
 
 .color-select-div {
@@ -217,6 +219,7 @@ body {
 #boxRange {
     position: relative;
     margin: auto;
+    margin-top: 10px;
     margin-left: 16px;
 }
 
@@ -228,9 +231,6 @@ body {
 
 
 @media only screen and (max-width: 700px) {
-    html {
-        overflow: visible;
-    }
     .all-UI {
         margin: auto;
         flex-direction: column-reverse;
@@ -261,6 +261,12 @@ body {
         height: 60px;
         width: 60px;
     }
+    .author-title {
+        position: relative;
+        top: -10px;
+        height: 20px;
+        color:#ededed;
+    }
     
     #tools-flex-div {
         width: 400px;
@@ -284,6 +290,9 @@ body {
         top: 4px;
         right: 30px;
         width: 200px;
+    }
+    #boxRange {
+        margin-top: 5px;
     }
     
 }
